@@ -1,23 +1,24 @@
 -- phpMyAdmin SQL Dump
--- version 3.5.2.2
--- http://www.phpmyadmin.net
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 20, 2025 at 09:25 AM
--- Server version: 5.5.27
--- PHP Version: 5.4.7
+-- Generation Time: Mar 03, 2026 at 12:19 PM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
-SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
 SET time_zone = "+00:00";
 
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
+/*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `k_shipping_db`
+-- Database: `accounting`
 --
 
 -- --------------------------------------------------------
@@ -26,14 +27,13 @@ SET time_zone = "+00:00";
 -- Table structure for table `balancesheet`
 --
 
-CREATE TABLE IF NOT EXISTS `balancesheet` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `balancesheet` (
+  `id` bigint(20) NOT NULL,
   `serial` varchar(4) DEFAULT NULL,
   `amount` double DEFAULT NULL,
   `ACCOUNTNAME` varchar(50) NOT NULL,
-  `sdgtotal` double DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=80 ;
+  `sdgtotal` double DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `balancesheet`
@@ -55,13 +55,12 @@ INSERT INTO `balancesheet` (`id`, `serial`, `amount`, `ACCOUNTNAME`, `sdgtotal`)
 -- Table structure for table `band`
 --
 
-CREATE TABLE IF NOT EXISTS `band` (
+CREATE TABLE `band` (
   `BAND_NO` decimal(6,0) NOT NULL,
-  `BAND_NAME` varchar(24) CHARACTER SET utf8 NOT NULL,
-  `BAND_TYPE` varchar(24) CHARACTER SET utf32 NOT NULL,
-  `root_no` int(11) NOT NULL DEFAULT '1',
-  PRIMARY KEY (`BAND_NO`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  `BAND_NAME` varchar(24) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `BAND_TYPE` varchar(24) CHARACTER SET utf32 COLLATE utf32_general_ci NOT NULL,
+  `root_no` int(11) NOT NULL DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Dumping data for table `band`
@@ -80,10 +79,10 @@ INSERT INTO `band` (`BAND_NO`, `BAND_NAME`, `BAND_TYPE`, `root_no`) VALUES
 -- Table structure for table `cargotype`
 --
 
-CREATE TABLE IF NOT EXISTS `cargotype` (
-  `cargo_COD` text,
-  `cargo_DSC` text
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+CREATE TABLE `cargotype` (
+  `cargo_COD` text DEFAULT NULL,
+  `cargo_DSC` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `cargotype`
@@ -242,9 +241,9 @@ INSERT INTO `cargotype` (`cargo_COD`, `cargo_DSC`) VALUES
 -- Table structure for table `city`
 --
 
-CREATE TABLE IF NOT EXISTS `city` (
-  `city_name` text
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+CREATE TABLE `city` (
+  `city_name` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `city`
@@ -355,11 +354,11 @@ INSERT INTO `city` (`city_name`) VALUES
 -- Table structure for table `clearance`
 --
 
-CREATE TABLE IF NOT EXISTS `clearance` (
+CREATE TABLE `clearance` (
   `DATE` date DEFAULT NULL,
   `STATEMENT` varchar(50) DEFAULT NULL,
   `INVOICE_NO` varchar(20) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 -- --------------------------------------------------------
 
@@ -367,12 +366,11 @@ CREATE TABLE IF NOT EXISTS `clearance` (
 -- Table structure for table `clearers`
 --
 
-CREATE TABLE IF NOT EXISTS `clearers` (
-  `clearerid` double NOT NULL AUTO_INCREMENT,
+CREATE TABLE `clearers` (
+  `clearerid` double NOT NULL,
   `clearername` varchar(100) NOT NULL,
-  `clearerno` int(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`clearerid`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=576 ;
+  `clearerno` int(11) NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `clearers`
@@ -820,7 +818,7 @@ INSERT INTO `clearers` (`clearerid`, `clearername`, `clearerno`) VALUES
 (443, 'ABDELHAFEEZ YOUSOF AHMED HASSAN', 1607),
 (444, 'Mostafa Mohamed Nour Mahmoud', 2877),
 (445, 'Hatim Mohamed Ibrahim', 3166),
-(446, 'ALI ALNASEH ALGALA"A', 2759),
+(446, 'ALI ALNASEH ALGALA\"A', 2759),
 (447, 'ABUBAKER MOHAMED MALIK', 2678),
 (448, 'YOUSIF ALI ADAM', 266),
 (449, 'HANI GALAL ISMAIEL AWAD ALLAH', 46),
@@ -956,11 +954,10 @@ INSERT INTO `clearers` (`clearerid`, `clearername`, `clearerno`) VALUES
 -- Table structure for table `clients`
 --
 
-CREATE TABLE IF NOT EXISTS `clients` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `name` varchar(150) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=4 ;
+CREATE TABLE `clients` (
+  `id` bigint(20) NOT NULL,
+  `name` varchar(150) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `clients`
@@ -977,15 +974,14 @@ INSERT INTO `clients` (`id`, `name`) VALUES
 -- Table structure for table `company`
 --
 
-CREATE TABLE IF NOT EXISTS `company` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+CREATE TABLE `company` (
+  `id` int(10) UNSIGNED NOT NULL,
   `name` varchar(100) NOT NULL DEFAULT 'SoftPro Computer Techology',
   `location` varchar(100) NOT NULL DEFAULT 'Port Sudan -AlRamah BDG north Post office ',
   `tel` varchar(100) NOT NULL DEFAULT '0311-838686',
   `email` varchar(100) DEFAULT 'support@softproco.com',
-  `taxid` varchar(30) NOT NULL DEFAULT '123456789',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
+  `taxid` varchar(30) NOT NULL DEFAULT '123456789'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `company`
@@ -1003,14 +999,13 @@ INSERT INTO `company` (`id`, `name`, `location`, `tel`, `email`, `taxid`) VALUES
 -- Table structure for table `dailymovement`
 --
 
-CREATE TABLE IF NOT EXISTS `dailymovement` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `dailymovement` (
+  `id` int(11) NOT NULL,
   `type` varchar(30) NOT NULL DEFAULT 'منصرف',
-  `amount` double NOT NULL DEFAULT '0',
+  `amount` double NOT NULL DEFAULT 0,
   `cdate` date DEFAULT NULL,
-  `desc` varchar(200) NOT NULL DEFAULT '-',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+  `desc` varchar(200) NOT NULL DEFAULT '-'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 -- --------------------------------------------------------
 
@@ -1018,39 +1013,38 @@ CREATE TABLE IF NOT EXISTS `dailymovement` (
 -- Table structure for table `delivery`
 --
 
-CREATE TABLE IF NOT EXISTS `delivery` (
+CREATE TABLE `delivery` (
   `del_date` date NOT NULL,
-  `landing` double NOT NULL DEFAULT '0',
+  `landing` double NOT NULL DEFAULT 0,
   `delivery` double NOT NULL,
-  `direct` double NOT NULL DEFAULT '0',
-  `conference` double NOT NULL DEFAULT '0',
-  `state` double NOT NULL DEFAULT '0',
-  `militry` double NOT NULL DEFAULT '0',
-  `stamp` double NOT NULL DEFAULT '0',
-  `wounded` double NOT NULL DEFAULT '0',
-  `others` double NOT NULL DEFAULT '0',
-  `total` double NOT NULL DEFAULT '0',
-  `vat` double NOT NULL DEFAULT '0',
-  `gtotal` double NOT NULL DEFAULT '0',
+  `direct` double NOT NULL DEFAULT 0,
+  `conference` double NOT NULL DEFAULT 0,
+  `state` double NOT NULL DEFAULT 0,
+  `militry` double NOT NULL DEFAULT 0,
+  `stamp` double NOT NULL DEFAULT 0,
+  `wounded` double NOT NULL DEFAULT 0,
+  `others` double NOT NULL DEFAULT 0,
+  `total` double NOT NULL DEFAULT 0,
+  `vat` double NOT NULL DEFAULT 0,
+  `gtotal` double NOT NULL DEFAULT 0,
   `clearername` varchar(100) NOT NULL DEFAULT 'clearer Name',
-  `del_serial` bigint(20) NOT NULL DEFAULT '1',
-  `ppd` double NOT NULL DEFAULT '0',
-  `clean` double NOT NULL DEFAULT '0',
-  `food` double NOT NULL DEFAULT '0',
-  `extraction` double NOT NULL DEFAULT '0',
-  `notifications` double NOT NULL DEFAULT '0',
-  `wharfage` double NOT NULL DEFAULT '0',
-  `admin` double NOT NULL DEFAULT '0',
-  `insurance` double NOT NULL DEFAULT '0',
-  `subtotal` double NOT NULL DEFAULT '0',
-  `thc` double NOT NULL DEFAULT '0',
-  `freight` double NOT NULL DEFAULT '0',
-  `congestion` double NOT NULL DEFAULT '0',
-  `elect` double NOT NULL DEFAULT '0',
+  `del_serial` bigint(20) NOT NULL DEFAULT 1,
+  `ppd` double NOT NULL DEFAULT 0,
+  `clean` double NOT NULL DEFAULT 0,
+  `food` double NOT NULL DEFAULT 0,
+  `extraction` double NOT NULL DEFAULT 0,
+  `notifications` double NOT NULL DEFAULT 0,
+  `wharfage` double NOT NULL DEFAULT 0,
+  `admin` double NOT NULL DEFAULT 0,
+  `insurance` double NOT NULL DEFAULT 0,
+  `subtotal` double NOT NULL DEFAULT 0,
+  `thc` double NOT NULL DEFAULT 0,
+  `freight` double NOT NULL DEFAULT 0,
+  `congestion` double NOT NULL DEFAULT 0,
+  `elect` double NOT NULL DEFAULT 0,
   `deposit` decimal(10,0) NOT NULL,
-  `lofguarantee` double NOT NULL DEFAULT '0',
-  PRIMARY KEY (`del_serial`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `lofguarantee` double NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `delivery`
@@ -1071,20 +1065,20 @@ INSERT INTO `delivery` (`del_date`, `landing`, `delivery`, `direct`, `conference
 -- Table structure for table `demset`
 --
 
-CREATE TABLE IF NOT EXISTS `demset` (
+CREATE TABLE `demset` (
   `container` varchar(5) NOT NULL DEFAULT '20GP',
-  `free` int(11) NOT NULL DEFAULT '15',
-  `next` int(11) NOT NULL DEFAULT '7',
-  `third` int(11) NOT NULL DEFAULT '5',
-  `fourth` int(11) NOT NULL DEFAULT '4',
-  `next_fee` double NOT NULL DEFAULT '15',
-  `third_fee` double NOT NULL DEFAULT '20',
-  `fourth_fee` double NOT NULL DEFAULT '25',
-  `then_fee` double NOT NULL DEFAULT '30',
-  `soba_free` int(11) NOT NULL DEFAULT '30',
-  `gree_free` double DEFAULT '0',
-  `line` int(11) NOT NULL DEFAULT '1'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `free` int(11) NOT NULL DEFAULT 15,
+  `next` int(11) NOT NULL DEFAULT 7,
+  `third` int(11) NOT NULL DEFAULT 5,
+  `fourth` int(11) NOT NULL DEFAULT 4,
+  `next_fee` double NOT NULL DEFAULT 15,
+  `third_fee` double NOT NULL DEFAULT 20,
+  `fourth_fee` double NOT NULL DEFAULT 25,
+  `then_fee` double NOT NULL DEFAULT 30,
+  `soba_free` int(11) NOT NULL DEFAULT 30,
+  `gree_free` double DEFAULT 0,
+  `line` int(11) NOT NULL DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `demset`
@@ -1116,27 +1110,26 @@ INSERT INTO `demset` (`container`, `free`, `next`, `third`, `fourth`, `next_fee`
 -- Table structure for table `demurrage`
 --
 
-CREATE TABLE IF NOT EXISTS `demurrage` (
+CREATE TABLE `demurrage` (
   `dem_date` date NOT NULL,
   `dem_clearer` varchar(100) NOT NULL,
-  `dem_usdvalue` double NOT NULL DEFAULT '0',
-  `dem_usdbalance` double NOT NULL DEFAULT '0',
-  `dem_sudanamount` double NOT NULL DEFAULT '0',
-  `dem_vat` double NOT NULL DEFAULT '0',
-  `dem_subtotal` double NOT NULL DEFAULT '0',
-  `dem_gtotal` double NOT NULL DEFAULT '0',
+  `dem_usdvalue` double NOT NULL DEFAULT 0,
+  `dem_usdbalance` double NOT NULL DEFAULT 0,
+  `dem_sudanamount` double NOT NULL DEFAULT 0,
+  `dem_vat` double NOT NULL DEFAULT 0,
+  `dem_subtotal` double NOT NULL DEFAULT 0,
+  `dem_gtotal` double NOT NULL DEFAULT 0,
   `dem_comments` varchar(100) DEFAULT NULL,
-  `dem_paid` int(11) NOT NULL DEFAULT '0',
+  `dem_paid` int(11) NOT NULL DEFAULT 0,
   `dem_piaddate` date DEFAULT NULL,
-  `dem_timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `dem_timestamp` timestamp NOT NULL DEFAULT current_timestamp(),
   `dem_user` varchar(100) NOT NULL DEFAULT '-',
   `dem_serial` bigint(20) NOT NULL,
-  `dem_deposit` double NOT NULL DEFAULT '0',
-  `dem_discount` double NOT NULL DEFAULT '0',
+  `dem_deposit` double NOT NULL DEFAULT 0,
+  `dem_discount` double NOT NULL DEFAULT 0,
   `dem_causes` varchar(100) NOT NULL DEFAULT '-',
-  `INSURANCE40` double NOT NULL DEFAULT '45',
-  PRIMARY KEY (`dem_serial`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `INSURANCE40` double NOT NULL DEFAULT 45
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `demurrage`
@@ -1160,14 +1153,12 @@ INSERT INTO `demurrage` (`dem_date`, `dem_clearer`, `dem_usdvalue`, `dem_usdbala
 -- Table structure for table `detail`
 --
 
-CREATE TABLE IF NOT EXISTS `detail` (
-  `DETAIL_NO` bigint(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `detail` (
+  `DETAIL_NO` bigint(11) NOT NULL,
   `DETAIL_NAME` varchar(100) NOT NULL,
   `DETAIL_SUBMAIN_NO` bigint(11) NOT NULL,
-  `BALANCE` decimal(15,2) DEFAULT '0.00',
-  PRIMARY KEY (`DETAIL_NO`),
-  KEY `fk_submain_detail` (`DETAIL_SUBMAIN_NO`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+  `BALANCE` decimal(15,2) DEFAULT 0.00
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 -- --------------------------------------------------------
 
@@ -1175,27 +1166,26 @@ CREATE TABLE IF NOT EXISTS `detail` (
 -- Table structure for table `detention`
 --
 
-CREATE TABLE IF NOT EXISTS `detention` (
+CREATE TABLE `detention` (
   `dem_date` date NOT NULL,
   `dem_clearer` varchar(100) NOT NULL,
-  `dem_usdvalue` double NOT NULL DEFAULT '0',
-  `dem_usdbalance` double NOT NULL DEFAULT '0',
-  `dem_sudanamount` double NOT NULL DEFAULT '0',
-  `dem_vat` double NOT NULL DEFAULT '0',
-  `dem_subtotal` double NOT NULL DEFAULT '0',
-  `dem_gtotal` double NOT NULL DEFAULT '0',
+  `dem_usdvalue` double NOT NULL DEFAULT 0,
+  `dem_usdbalance` double NOT NULL DEFAULT 0,
+  `dem_sudanamount` double NOT NULL DEFAULT 0,
+  `dem_vat` double NOT NULL DEFAULT 0,
+  `dem_subtotal` double NOT NULL DEFAULT 0,
+  `dem_gtotal` double NOT NULL DEFAULT 0,
   `dem_comments` varchar(100) DEFAULT NULL,
-  `dem_paid` int(11) NOT NULL DEFAULT '0',
+  `dem_paid` int(11) NOT NULL DEFAULT 0,
   `dem_piaddate` date DEFAULT NULL,
-  `dem_timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `dem_timestamp` timestamp NOT NULL DEFAULT current_timestamp(),
   `dem_user` varchar(100) NOT NULL DEFAULT '-',
   `dem_serial` bigint(20) NOT NULL,
-  `dem_deposit` double NOT NULL DEFAULT '0',
-  `dem_discount` double NOT NULL DEFAULT '0',
+  `dem_deposit` double NOT NULL DEFAULT 0,
+  `dem_discount` double NOT NULL DEFAULT 0,
   `dem_causes` varchar(100) NOT NULL DEFAULT '-',
-  `INSURANCE40` double NOT NULL DEFAULT '45',
-  PRIMARY KEY (`dem_serial`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `INSURANCE40` double NOT NULL DEFAULT 45
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `detention`
@@ -1219,20 +1209,20 @@ INSERT INTO `detention` (`dem_date`, `dem_clearer`, `dem_usdvalue`, `dem_usdbala
 -- Table structure for table `detset`
 --
 
-CREATE TABLE IF NOT EXISTS `detset` (
+CREATE TABLE `detset` (
   `container` varchar(5) NOT NULL DEFAULT '20GP',
-  `free` int(11) NOT NULL DEFAULT '15',
-  `next` int(11) NOT NULL DEFAULT '7',
-  `third` int(11) NOT NULL DEFAULT '5',
-  `fourth` int(11) NOT NULL DEFAULT '4',
-  `next_fee` double NOT NULL DEFAULT '15',
-  `third_fee` double NOT NULL DEFAULT '20',
-  `fourth_fee` double NOT NULL DEFAULT '25',
-  `then_fee` double NOT NULL DEFAULT '30',
-  `soba_free` int(11) NOT NULL DEFAULT '30',
-  `gree_free` double DEFAULT '0',
-  `line` int(11) NOT NULL DEFAULT '1'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `free` int(11) NOT NULL DEFAULT 15,
+  `next` int(11) NOT NULL DEFAULT 7,
+  `third` int(11) NOT NULL DEFAULT 5,
+  `fourth` int(11) NOT NULL DEFAULT 4,
+  `next_fee` double NOT NULL DEFAULT 15,
+  `third_fee` double NOT NULL DEFAULT 20,
+  `fourth_fee` double NOT NULL DEFAULT 25,
+  `then_fee` double NOT NULL DEFAULT 30,
+  `soba_free` int(11) NOT NULL DEFAULT 30,
+  `gree_free` double DEFAULT 0,
+  `line` int(11) NOT NULL DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `detset`
@@ -1264,48 +1254,47 @@ INSERT INTO `detset` (`container`, `free`, `next`, `third`, `fourth`, `next_fee`
 -- Table structure for table `dsetting`
 --
 
-CREATE TABLE IF NOT EXISTS `dsetting` (
-  `id` bigint(20) NOT NULL DEFAULT '1',
-  `landing20` double NOT NULL DEFAULT '105',
-  `landing40` double NOT NULL DEFAULT '205',
-  `delivery` double NOT NULL DEFAULT '25',
-  `clean20` double NOT NULL DEFAULT '50',
-  `clean40` double NOT NULL DEFAULT '50',
-  `conference` double NOT NULL DEFAULT '3',
-  `admin` double NOT NULL DEFAULT '1',
-  `militry` double NOT NULL DEFAULT '0.5',
-  `stamp` double DEFAULT '1',
-  `food` double NOT NULL DEFAULT '7',
-  `extraction` double DEFAULT '30',
-  `state` double NOT NULL DEFAULT '0',
-  `Notifications` double NOT NULL DEFAULT '50',
-  `Wharfage20` double NOT NULL DEFAULT '20',
+CREATE TABLE `dsetting` (
+  `id` bigint(20) NOT NULL DEFAULT 1,
+  `landing20` double NOT NULL DEFAULT 105,
+  `landing40` double NOT NULL DEFAULT 205,
+  `delivery` double NOT NULL DEFAULT 25,
+  `clean20` double NOT NULL DEFAULT 50,
+  `clean40` double NOT NULL DEFAULT 50,
+  `conference` double NOT NULL DEFAULT 3,
+  `admin` double NOT NULL DEFAULT 1,
+  `militry` double NOT NULL DEFAULT 0.5,
+  `stamp` double DEFAULT 1,
+  `food` double NOT NULL DEFAULT 7,
+  `extraction` double DEFAULT 30,
+  `state` double NOT NULL DEFAULT 0,
+  `Notifications` double NOT NULL DEFAULT 50,
+  `Wharfage20` double NOT NULL DEFAULT 20,
   `Wharfage40` double DEFAULT NULL,
-  `ADMIN20` double NOT NULL DEFAULT '20',
-  `ADMIN40` double NOT NULL DEFAULT '40',
-  `vat` double NOT NULL DEFAULT '0.17',
-  `insu20in` double NOT NULL DEFAULT '0',
-  `elect20` double NOT NULL DEFAULT '20',
-  `elect40` double NOT NULL DEFAULT '45',
-  `congestion20` double NOT NULL DEFAULT '24',
-  `congestion40` double NOT NULL DEFAULT '24',
-  `usdrate` double NOT NULL DEFAULT '17.4',
-  `co_taxno` bigint(20) NOT NULL DEFAULT '123456789011111',
-  `insu20out` double NOT NULL DEFAULT '0',
-  `dsett_log` double NOT NULL DEFAULT '20',
-  `dsett_do` double NOT NULL DEFAULT '40',
-  `insu40in` double NOT NULL DEFAULT '0',
-  `insu40out` double NOT NULL DEFAULT '0',
-  `expdayval` double NOT NULL DEFAULT '0',
-  `lifting` double NOT NULL DEFAULT '0',
-  `trafic` double NOT NULL DEFAULT '0',
-  `tourism` double NOT NULL DEFAULT '0',
-  `province` double NOT NULL DEFAULT '0',
-  `eus` double NOT NULL DEFAULT '0',
-  `ssc` double NOT NULL DEFAULT '0',
-  `letterogguarantee` double NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `ADMIN20` double NOT NULL DEFAULT 20,
+  `ADMIN40` double NOT NULL DEFAULT 40,
+  `vat` double NOT NULL DEFAULT 0.17,
+  `insu20in` double NOT NULL DEFAULT 0,
+  `elect20` double NOT NULL DEFAULT 20,
+  `elect40` double NOT NULL DEFAULT 45,
+  `congestion20` double NOT NULL DEFAULT 24,
+  `congestion40` double NOT NULL DEFAULT 24,
+  `usdrate` double NOT NULL DEFAULT 17.4,
+  `co_taxno` bigint(20) NOT NULL DEFAULT 123456789011111,
+  `insu20out` double NOT NULL DEFAULT 0,
+  `dsett_log` double NOT NULL DEFAULT 20,
+  `dsett_do` double NOT NULL DEFAULT 40,
+  `insu40in` double NOT NULL DEFAULT 0,
+  `insu40out` double NOT NULL DEFAULT 0,
+  `expdayval` double NOT NULL DEFAULT 0,
+  `lifting` double NOT NULL DEFAULT 0,
+  `trafic` double NOT NULL DEFAULT 0,
+  `tourism` double NOT NULL DEFAULT 0,
+  `province` double NOT NULL DEFAULT 0,
+  `eus` double NOT NULL DEFAULT 0,
+  `ssc` double NOT NULL DEFAULT 0,
+  `letterogguarantee` double NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `dsetting`
@@ -1320,12 +1309,11 @@ INSERT INTO `dsetting` (`id`, `landing20`, `landing40`, `delivery`, `clean20`, `
 -- Table structure for table `edi_hash_log`
 --
 
-CREATE TABLE IF NOT EXISTS `edi_hash_log` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `edi_hash_log` (
+  `id` int(11) NOT NULL,
   `hash_value` varchar(256) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=69 ;
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Dumping data for table `edi_hash_log`
@@ -1371,12 +1359,11 @@ INSERT INTO `edi_hash_log` (`id`, `hash_value`, `created_at`) VALUES
 -- Table structure for table `edi_lock`
 --
 
-CREATE TABLE IF NOT EXISTS `edi_lock` (
+CREATE TABLE `edi_lock` (
   `id` int(11) NOT NULL,
-  `is_locked` tinyint(1) NOT NULL DEFAULT '0',
-  `locked_at` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  `is_locked` tinyint(1) NOT NULL DEFAULT 0,
+  `locked_at` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Dumping data for table `edi_lock`
@@ -1391,12 +1378,12 @@ INSERT INTO `edi_lock` (`id`, `is_locked`, `locked_at`) VALUES
 -- Table structure for table `exform`
 --
 
-CREATE TABLE IF NOT EXISTS `exform` (
+CREATE TABLE `exform` (
   `id` bigint(20) DEFAULT NULL,
   `exblno` varchar(50) NOT NULL,
   `exvoyno` int(11) NOT NULL,
   `exno` varchar(50) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `exform`
@@ -1420,8 +1407,8 @@ INSERT INTO `exform` (`id`, `exblno`, `exvoyno`, `exno`) VALUES
 -- Table structure for table `ex_manifest`
 --
 
-CREATE TABLE IF NOT EXISTS `ex_manifest` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `ex_manifest` (
+  `id` int(11) NOT NULL,
   `vessel` varchar(255) DEFAULT NULL,
   `voy` varchar(50) DEFAULT NULL,
   `port_loading` varchar(255) DEFAULT NULL,
@@ -1436,17 +1423,16 @@ CREATE TABLE IF NOT EXISTS `ex_manifest` (
   `net_kgs` decimal(10,2) DEFAULT NULL,
   `grs_kgs` decimal(10,2) DEFAULT NULL,
   `tare_kgs` decimal(10,2) DEFAULT NULL,
-  `description` text,
-  `remarks` text,
+  `description` text DEFAULT NULL,
+  `remarks` text DEFAULT NULL,
   `date` date DEFAULT NULL,
   `booking` varchar(250) NOT NULL DEFAULT '-',
-  `noofpkg` bigint(20) NOT NULL DEFAULT '0',
+  `noofpkg` bigint(20) NOT NULL DEFAULT 0,
   `size` varchar(50) NOT NULL DEFAULT '-',
-  `ftotal` double NOT NULL DEFAULT '0',
+  `ftotal` double NOT NULL DEFAULT 0,
   `ftotalpaid` varchar(20) NOT NULL DEFAULT '-',
-  `paid` double NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=41 ;
+  `paid` double NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `ex_manifest`
@@ -1500,8 +1486,8 @@ INSERT INTO `ex_manifest` (`id`, `vessel`, `voy`, `port_loading`, `port_discharg
 -- Table structure for table `gate_in`
 --
 
-CREATE TABLE IF NOT EXISTS `gate_in` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `gate_in` (
+  `id` int(11) NOT NULL,
   `vessel_code` varchar(50) DEFAULT NULL,
   `vessel_name` varchar(100) DEFAULT NULL,
   `shipping_line` varchar(100) DEFAULT NULL,
@@ -1518,11 +1504,10 @@ CREATE TABLE IF NOT EXISTS `gate_in` (
   `place_of_loading` varchar(100) DEFAULT NULL,
   `truck_id` varchar(50) DEFAULT NULL,
   `inland_transport_mode` varchar(100) DEFAULT NULL,
-  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `last_hash` varchar(255) DEFAULT NULL,
-  `last_generated` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=11 ;
+  `last_generated` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `gate_in`
@@ -1543,54 +1528,51 @@ INSERT INTO `gate_in` (`id`, `vessel_code`, `vessel_name`, `shipping_line`, `pla
 -- Table structure for table `gdelivery`
 --
 
-CREATE TABLE IF NOT EXISTS `gdelivery` (
+CREATE TABLE `gdelivery` (
   `del_date` date NOT NULL,
-  `landing` double NOT NULL DEFAULT '0',
-  `delivery` double NOT NULL DEFAULT '0',
-  `direct` double NOT NULL DEFAULT '0',
-  `ssc` double NOT NULL DEFAULT '0',
-  `eus` double NOT NULL DEFAULT '0',
-  `we` double NOT NULL DEFAULT '0',
-  `stamp` double NOT NULL DEFAULT '0',
-  `wounded` double NOT NULL DEFAULT '0',
-  `others` double NOT NULL DEFAULT '0',
-  `total` double NOT NULL DEFAULT '0',
-  `vat` double NOT NULL DEFAULT '0',
-  `gtotal` double NOT NULL DEFAULT '0',
+  `landing` double NOT NULL DEFAULT 0,
+  `delivery` double NOT NULL DEFAULT 0,
+  `direct` double NOT NULL DEFAULT 0,
+  `ssc` double NOT NULL DEFAULT 0,
+  `eus` double NOT NULL DEFAULT 0,
+  `we` double NOT NULL DEFAULT 0,
+  `stamp` double NOT NULL DEFAULT 0,
+  `wounded` double NOT NULL DEFAULT 0,
+  `others` double NOT NULL DEFAULT 0,
+  `total` double NOT NULL DEFAULT 0,
+  `vat` double NOT NULL DEFAULT 0,
+  `gtotal` double NOT NULL DEFAULT 0,
   `clearername` varchar(100) NOT NULL DEFAULT 'clearer Name',
-  `del_serial` bigint(20) NOT NULL DEFAULT '1',
-  `ppd` double NOT NULL DEFAULT '0',
-  `clean` double NOT NULL DEFAULT '0',
-  `food` double NOT NULL DEFAULT '0',
-  `extraction` double NOT NULL DEFAULT '0',
-  `wharfage` double NOT NULL DEFAULT '0',
-  `admin` double NOT NULL DEFAULT '0',
-  `insurance` double NOT NULL DEFAULT '0',
-  `subtotal` double NOT NULL DEFAULT '0',
-  `thc` double NOT NULL DEFAULT '0',
-  `freight` double NOT NULL DEFAULT '0',
-  `congestion` double NOT NULL DEFAULT '0',
-  `quarantee` double NOT NULL DEFAULT '0',
-  `deposit` double NOT NULL DEFAULT '0',
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `del_serial` bigint(20) NOT NULL DEFAULT 1,
+  `ppd` double NOT NULL DEFAULT 0,
+  `clean` double NOT NULL DEFAULT 0,
+  `food` double NOT NULL DEFAULT 0,
+  `extraction` double NOT NULL DEFAULT 0,
+  `wharfage` double NOT NULL DEFAULT 0,
+  `admin` double NOT NULL DEFAULT 0,
+  `insurance` double NOT NULL DEFAULT 0,
+  `subtotal` double NOT NULL DEFAULT 0,
+  `thc` double NOT NULL DEFAULT 0,
+  `freight` double NOT NULL DEFAULT 0,
+  `congestion` double NOT NULL DEFAULT 0,
+  `quarantee` double NOT NULL DEFAULT 0,
+  `deposit` double NOT NULL DEFAULT 0,
+  `id` int(11) NOT NULL,
   `co_del` varchar(30) NOT NULL,
-  `levy_traffic` double NOT NULL DEFAULT '0',
-  `finance` double NOT NULL DEFAULT '0',
-  `notification` double NOT NULL DEFAULT '0',
-  `do_stamp` double NOT NULL DEFAULT '0',
-  `pc_stamp` double NOT NULL DEFAULT '0',
+  `levy_traffic` double NOT NULL DEFAULT 0,
+  `finance` double NOT NULL DEFAULT 0,
+  `notification` double NOT NULL DEFAULT 0,
+  `do_stamp` double NOT NULL DEFAULT 0,
+  `pc_stamp` double NOT NULL DEFAULT 0,
   `df` double NOT NULL,
   `trs` double NOT NULL,
   `services` double NOT NULL,
   `douser` varchar(50) NOT NULL DEFAULT 'Mohamed',
   `stevedoring` double NOT NULL,
   `docno` varchar(50) NOT NULL DEFAULT '-',
-  `paid` int(11) NOT NULL DEFAULT '0',
-  `org` int(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `del_serial` (`del_serial`),
-  UNIQUE KEY `co_del` (`co_del`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=17 ;
+  `paid` int(11) NOT NULL DEFAULT 0,
+  `org` int(11) NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `gdelivery`
@@ -1620,9 +1602,9 @@ INSERT INTO `gdelivery` (`del_date`, `landing`, `delivery`, `direct`, `ssc`, `eu
 -- Table structure for table `gdelset`
 --
 
-CREATE TABLE IF NOT EXISTS `gdelset` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `dsett_log` double NOT NULL DEFAULT '0',
+CREATE TABLE `gdelset` (
+  `id` int(11) NOT NULL,
+  `dsett_log` double NOT NULL DEFAULT 0,
   `dsett_do` double NOT NULL,
   `dsett_ddelivery` double NOT NULL,
   `dsett_ssc` double NOT NULL,
@@ -1641,47 +1623,46 @@ CREATE TABLE IF NOT EXISTS `gdelset` (
   `dsett_trailers` double NOT NULL,
   `dsett_eus` double NOT NULL,
   `dsett_blank` double NOT NULL,
-  `dsett_others` double NOT NULL DEFAULT '0',
-  `dsett_vat` double NOT NULL DEFAULT '0.17',
-  `dsett_cont20` double NOT NULL DEFAULT '300',
-  `dsett_cont40` double NOT NULL DEFAULT '400',
-  `dsett_food` double NOT NULL DEFAULT '150',
-  `dsett_levy_traffic` double NOT NULL DEFAULT '250',
-  `dsett_administration'` double NOT NULL DEFAULT '300',
-  `dsett_administration` double NOT NULL DEFAULT '190',
-  `dsett_services` double NOT NULL DEFAULT '250',
-  `dsett_pc_stamp` int(11) NOT NULL DEFAULT '150',
+  `dsett_others` double NOT NULL DEFAULT 0,
+  `dsett_vat` double NOT NULL DEFAULT 0.17,
+  `dsett_cont20` double NOT NULL DEFAULT 300,
+  `dsett_cont40` double NOT NULL DEFAULT 400,
+  `dsett_food` double NOT NULL DEFAULT 150,
+  `dsett_levy_traffic` double NOT NULL DEFAULT 250,
+  `dsett_administration'` double NOT NULL DEFAULT 300,
+  `dsett_administration` double NOT NULL DEFAULT 190,
+  `dsett_services` double NOT NULL DEFAULT 250,
+  `dsett_pc_stamp` int(11) NOT NULL DEFAULT 150,
   `dsett_df` double NOT NULL,
   `dsett_trs` double NOT NULL,
-  `dsett_notification` double NOT NULL DEFAULT '0',
+  `dsett_notification` double NOT NULL DEFAULT 0,
   `dsett_insurance` double NOT NULL,
   `dsett_do_stamp` double NOT NULL,
   `dsett_stevedoring` double NOT NULL,
-  `dsett_cattle` double NOT NULL DEFAULT '0',
-  `dsett_bag` double NOT NULL DEFAULT '0',
-  `dsett_box` double NOT NULL DEFAULT '0',
-  `dsett_pipe` double NOT NULL DEFAULT '0',
-  `dsett_bale` double NOT NULL DEFAULT '0',
-  `dsett_case` double NOT NULL DEFAULT '0',
-  `dsett_cylinder` double NOT NULL DEFAULT '0',
-  `dsett_drum` double NOT NULL DEFAULT '0',
-  `dsett_barrle` double NOT NULL DEFAULT '0',
-  `dsett_carton` double NOT NULL DEFAULT '0',
-  `dsett_stvlorry` double NOT NULL DEFAULT '0',
-  `dsett_stvtrwtrk` double NOT NULL DEFAULT '0',
-  `dsett_stvcargomore5` double NOT NULL DEFAULT '0',
-  `dsett_stvlongbus` double NOT NULL DEFAULT '0',
-  `dsett_stvrefg` double NOT NULL DEFAULT '0',
-  `dsett_stvtra` double NOT NULL DEFAULT '0',
-  `dsett_stvsaloon` double NOT NULL DEFAULT '0',
-  `dsett_stvpickup` double NOT NULL DEFAULT '0',
-  `dsett_stvheavywtire` double NOT NULL DEFAULT '0',
-  `dsett_stvheavywchain` double NOT NULL DEFAULT '0',
-  `dsett_stvcargoless5` double NOT NULL DEFAULT '0',
-  `dsett_stvsmallbus` double NOT NULL DEFAULT '0',
-  `dsett_stvrefgwithtruck` double NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+  `dsett_cattle` double NOT NULL DEFAULT 0,
+  `dsett_bag` double NOT NULL DEFAULT 0,
+  `dsett_box` double NOT NULL DEFAULT 0,
+  `dsett_pipe` double NOT NULL DEFAULT 0,
+  `dsett_bale` double NOT NULL DEFAULT 0,
+  `dsett_case` double NOT NULL DEFAULT 0,
+  `dsett_cylinder` double NOT NULL DEFAULT 0,
+  `dsett_drum` double NOT NULL DEFAULT 0,
+  `dsett_barrle` double NOT NULL DEFAULT 0,
+  `dsett_carton` double NOT NULL DEFAULT 0,
+  `dsett_stvlorry` double NOT NULL DEFAULT 0,
+  `dsett_stvtrwtrk` double NOT NULL DEFAULT 0,
+  `dsett_stvcargomore5` double NOT NULL DEFAULT 0,
+  `dsett_stvlongbus` double NOT NULL DEFAULT 0,
+  `dsett_stvrefg` double NOT NULL DEFAULT 0,
+  `dsett_stvtra` double NOT NULL DEFAULT 0,
+  `dsett_stvsaloon` double NOT NULL DEFAULT 0,
+  `dsett_stvpickup` double NOT NULL DEFAULT 0,
+  `dsett_stvheavywtire` double NOT NULL DEFAULT 0,
+  `dsett_stvheavywchain` double NOT NULL DEFAULT 0,
+  `dsett_stvcargoless5` double NOT NULL DEFAULT 0,
+  `dsett_stvsmallbus` double NOT NULL DEFAULT 0,
+  `dsett_stvrefgwithtruck` double NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `gdelset`
@@ -1696,9 +1677,9 @@ INSERT INTO `gdelset` (`id`, `dsett_log`, `dsett_do`, `dsett_ddelivery`, `dsett_
 -- Table structure for table `gmanifest`
 --
 
-CREATE TABLE IF NOT EXISTS `gmanifest` (
-  `mast_id` double NOT NULL AUTO_INCREMENT,
-  `mast_vslvoy` int(11) NOT NULL DEFAULT '0',
+CREATE TABLE `gmanifest` (
+  `mast_id` double NOT NULL,
+  `mast_vslvoy` int(11) NOT NULL DEFAULT 0,
   `mast_updateperson` varchar(50) DEFAULT '',
   `mast_blno` varchar(100) NOT NULL,
   `mast_cno` varchar(100) NOT NULL DEFAULT '-',
@@ -1707,30 +1688,29 @@ CREATE TABLE IF NOT EXISTS `gmanifest` (
   `MAST_POL` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `mast_ctype` varchar(100) DEFAULT 'FCL',
   `MAST_D_DATE` date DEFAULT NULL,
-  `MAST_D_SERIAL` bigint(20) NOT NULL DEFAULT '0',
+  `MAST_D_SERIAL` bigint(20) NOT NULL DEFAULT 0,
   `MAST_emptyDATE` date DEFAULT NULL,
   `MAST_WEIGHT` bigint(20) NOT NULL,
-  `MAST_KEYNO` double NOT NULL DEFAULT '0',
-  `mast_nweight` bigint(20) NOT NULL DEFAULT '0',
+  `MAST_KEYNO` double NOT NULL DEFAULT 0,
+  `mast_nweight` bigint(20) NOT NULL DEFAULT 0,
   `MAST_shipper` varchar(200) NOT NULL DEFAULT '-',
   `mast_notify` varchar(200) NOT NULL DEFAULT '-',
   `mast_cargo` varchar(150) NOT NULL DEFAULT 'G/C',
   `mast_bldate` date DEFAULT NULL,
-  `MAST_NOP` bigint(20) NOT NULL DEFAULT '1',
+  `MAST_NOP` bigint(20) NOT NULL DEFAULT 1,
   `MAST_PERSON` varchar(50) DEFAULT NULL,
   `MAST_DESC` varchar(250) DEFAULT NULL,
   `MAST_KIND` varchar(10) NOT NULL,
-  `CREATTIME` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `mast_status` int(11) NOT NULL DEFAULT '0',
+  `CREATTIME` timestamp NOT NULL DEFAULT current_timestamp(),
+  `mast_status` int(11) NOT NULL DEFAULT 0,
   `mast_mark` varchar(100) DEFAULT 'mark',
-  `mast_dem_serial` bigint(20) NOT NULL DEFAULT '0',
+  `mast_dem_serial` bigint(20) NOT NULL DEFAULT 0,
   `mast_isopol` varchar(6) NOT NULL DEFAULT 'isopol',
   `mast_lotno` varchar(50) NOT NULL DEFAULT '-',
   `mast_csize` varchar(5) NOT NULL DEFAULT '20GP',
   `mast_type` varchar(25) NOT NULL,
-  `transit` int(11) NOT NULL DEFAULT '23',
-  PRIMARY KEY (`mast_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=38 ;
+  `transit` int(11) NOT NULL DEFAULT 23
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `gmanifest`
@@ -1781,33 +1761,32 @@ INSERT INTO `gmanifest` (`mast_id`, `mast_vslvoy`, `mast_updateperson`, `mast_bl
 -- Table structure for table `htc`
 --
 
-CREATE TABLE IF NOT EXISTS `htc` (
-  `id` bigint(20) NOT NULL DEFAULT '1',
-  `discharge_full_20` double NOT NULL DEFAULT '0',
-  `discharge_full_40` double NOT NULL DEFAULT '0',
-  `discharge_empty_20` double NOT NULL DEFAULT '0',
-  `discharge_empty_40` double NOT NULL DEFAULT '0',
-  `export_full_20` double NOT NULL DEFAULT '0',
-  `export_full_40` double NOT NULL DEFAULT '0',
-  `export_empty_20` double NOT NULL DEFAULT '0',
-  `export_empty_40` double NOT NULL DEFAULT '0',
-  `imo_20` double DEFAULT '0',
-  `imo_40` double NOT NULL DEFAULT '0',
-  `importF_flat_20` double DEFAULT '0',
-  `importF_flat_40` double NOT NULL DEFAULT '0',
-  `importF_ot_20` double NOT NULL DEFAULT '0',
-  `importF_ot_40` double NOT NULL DEFAULT '0',
-  `exportF_flat_20` double DEFAULT '0',
-  `exportF_flat_40` double NOT NULL DEFAULT '0',
-  `exportF_ot_20` double NOT NULL DEFAULT '0',
-  `exportF_ot_40` double NOT NULL DEFAULT '0',
-  `exportE_flat_20` double NOT NULL DEFAULT '0',
-  `exportE_flat_40` double NOT NULL DEFAULT '0',
-  `exportE_ot_20` double NOT NULL DEFAULT '0',
-  `exportE_ot_40` double NOT NULL DEFAULT '0',
-  `special_handling_45` double NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+CREATE TABLE `htc` (
+  `id` bigint(20) NOT NULL DEFAULT 1,
+  `discharge_full_20` double NOT NULL DEFAULT 0,
+  `discharge_full_40` double NOT NULL DEFAULT 0,
+  `discharge_empty_20` double NOT NULL DEFAULT 0,
+  `discharge_empty_40` double NOT NULL DEFAULT 0,
+  `export_full_20` double NOT NULL DEFAULT 0,
+  `export_full_40` double NOT NULL DEFAULT 0,
+  `export_empty_20` double NOT NULL DEFAULT 0,
+  `export_empty_40` double NOT NULL DEFAULT 0,
+  `imo_20` double DEFAULT 0,
+  `imo_40` double NOT NULL DEFAULT 0,
+  `importF_flat_20` double DEFAULT 0,
+  `importF_flat_40` double NOT NULL DEFAULT 0,
+  `importF_ot_20` double NOT NULL DEFAULT 0,
+  `importF_ot_40` double NOT NULL DEFAULT 0,
+  `exportF_flat_20` double DEFAULT 0,
+  `exportF_flat_40` double NOT NULL DEFAULT 0,
+  `exportF_ot_20` double NOT NULL DEFAULT 0,
+  `exportF_ot_40` double NOT NULL DEFAULT 0,
+  `exportE_flat_20` double NOT NULL DEFAULT 0,
+  `exportE_flat_40` double NOT NULL DEFAULT 0,
+  `exportE_ot_20` double NOT NULL DEFAULT 0,
+  `exportE_ot_40` double NOT NULL DEFAULT 0,
+  `special_handling_45` double NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `htc`
@@ -1822,14 +1801,13 @@ INSERT INTO `htc` (`id`, `discharge_full_20`, `discharge_full_40`, `discharge_em
 -- Table structure for table `income`
 --
 
-CREATE TABLE IF NOT EXISTS `income` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `income` (
+  `id` bigint(20) NOT NULL,
   `serial` varchar(3) DEFAULT NULL,
   `account` varchar(50) DEFAULT NULL,
   `sdg` varchar(20) DEFAULT NULL,
-  `sdgtotal` varchar(20) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=324 ;
+  `sdgtotal` varchar(20) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `income`
@@ -1846,15 +1824,14 @@ INSERT INTO `income` (`id`, `serial`, `account`, `sdg`, `sdgtotal`) VALUES
 -- Table structure for table `invoice`
 --
 
-CREATE TABLE IF NOT EXISTS `invoice` (
+CREATE TABLE `invoice` (
   `DATE` date DEFAULT NULL,
   `CUSTOMER` varchar(40) DEFAULT NULL,
   `DESCRIBTION` varchar(100) DEFAULT NULL,
   `INVOICE_NO` varchar(20) NOT NULL,
   `NAME` varchar(50) DEFAULT NULL,
-  `FLAG` bigint(20) DEFAULT '1',
-  PRIMARY KEY (`INVOICE_NO`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `FLAG` bigint(20) DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `invoice`
@@ -1872,11 +1849,10 @@ INSERT INTO `invoice` (`DATE`, `CUSTOMER`, `DESCRIBTION`, `INVOICE_NO`, `NAME`, 
 -- Table structure for table `isopol`
 --
 
-CREATE TABLE IF NOT EXISTS `isopol` (
+CREATE TABLE `isopol` (
   `POL` varchar(50) NOT NULL,
-  `ISOPOL` varchar(6) NOT NULL,
-  PRIMARY KEY (`ISOPOL`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `ISOPOL` varchar(6) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 -- --------------------------------------------------------
 
@@ -1884,23 +1860,22 @@ CREATE TABLE IF NOT EXISTS `isopol` (
 -- Table structure for table `journal`
 --
 
-CREATE TABLE IF NOT EXISTS `journal` (
+CREATE TABLE `journal` (
   `ID` int(11) DEFAULT NULL,
   `JOURNAL_DATE` date DEFAULT NULL,
-  `JOURNAL_SUBMAIN_NO` decimal(6,0) NOT NULL DEFAULT '0',
-  `JOURNAL_DOCNO` varchar(100) CHARACTER SET utf8 DEFAULT NULL,
-  `JOURNAL_DESC` varchar(200) CHARACTER SET utf8 NOT NULL DEFAULT '-',
-  `JOURNAL_USER` varchar(50) CHARACTER SET utf8 NOT NULL DEFAULT '-',
+  `JOURNAL_SUBMAIN_NO` decimal(6,0) NOT NULL DEFAULT 0,
+  `JOURNAL_DOCNO` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
+  `JOURNAL_DESC` varchar(200) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '-',
+  `JOURNAL_USER` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '-',
   `JOURNAL_DR` double DEFAULT NULL,
   `JOURNAL_CR` double DEFAULT NULL,
-  `IDAUTO` int(11) NOT NULL AUTO_INCREMENT,
-  `method` varchar(30) CHARACTER SET utf8 NOT NULL DEFAULT '0',
-  `sale_inv` bigint(20) NOT NULL DEFAULT '0',
+  `IDAUTO` int(11) NOT NULL,
+  `method` varchar(30) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '0',
+  `sale_inv` bigint(20) NOT NULL DEFAULT 0,
   `JOURNAL_NO` int(55) NOT NULL,
-  `company_id` int(11) NOT NULL DEFAULT '0',
-  `user_id` int(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`IDAUTO`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=79 ;
+  `company_id` int(11) NOT NULL DEFAULT 0,
+  `user_id` int(11) NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Dumping data for table `journal`
@@ -1920,10 +1895,10 @@ INSERT INTO `journal` (`ID`, `JOURNAL_DATE`, `JOURNAL_SUBMAIN_NO`, `JOURNAL_DOCN
 -- Table structure for table `line`
 --
 
-CREATE TABLE IF NOT EXISTS `line` (
+CREATE TABLE `line` (
   `id` int(11) NOT NULL,
   `name` varchar(50) NOT NULL DEFAULT '-'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `line`
@@ -1940,12 +1915,11 @@ INSERT INTO `line` (`id`, `name`) VALUES
 -- Table structure for table `loct`
 --
 
-CREATE TABLE IF NOT EXISTS `loct` (
-  `isopol` text,
-  `pol` text,
-  `ID` int(11) NOT NULL AUTO_INCREMENT,
-  PRIMARY KEY (`ID`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=15286 ;
+CREATE TABLE `loct` (
+  `isopol` text DEFAULT NULL,
+  `pol` text DEFAULT NULL,
+  `ID` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `loct`
@@ -2867,7 +2841,7 @@ INSERT INTO `loct` (`isopol`, `pol`, `ID`) VALUES
 ('USMNU', 'MERMENTAU', 912),
 ('USNCC', 'NORTH CANAAN', 913),
 ('USOAJ', 'JACKSONVILLE', 914),
-('USODO', 'O''DONNELL', 915),
+('USODO', 'O\'DONNELL', 915),
 ('USOGB', 'ORANGEBURG', 916),
 ('USPRU', 'PRUDHOE', 917),
 ('USSCM', 'SPENCER', 918),
@@ -3187,7 +3161,7 @@ INSERT INTO `loct` (`isopol`, `pol`, `ID`) VALUES
 ('USHAF', 'HARTFORD', 1232),
 ('USILE', 'KILLEEN', 1233),
 ('USKAN', 'KANE', 1234),
-('USLOL', 'LAND O'' LAKES', 1235),
+('USLOL', 'LAND O\' LAKES', 1235),
 ('USLSC', 'LAURENS', 1236),
 ('USMEX', 'MECCA', 1237),
 ('USMSS', 'MASSENA', 1238),
@@ -3646,7 +3620,7 @@ INSERT INTO `loct` (`isopol`, `pol`, `ID`) VALUES
 ('USNRG', 'NORTH READING', 1691),
 ('USNVI', 'NEVILLE ISLAND', 1692),
 ('USNWW', 'NEW TAZEWELL', 1693),
-('USOFL', 'O''FALLON', 1694),
+('USOFL', 'O\'FALLON', 1694),
 ('USOPI', 'OPELIKA', 1695),
 ('USORY', 'ORDBEND', 1696),
 ('USPHQ', 'PANORAMA CITY', 1697),
@@ -3955,7 +3929,7 @@ INSERT INTO `loct` (`isopol`, `pol`, `ID`) VALUES
 ('USPCM', 'PASS CHRISTIAN', 1999),
 ('USPFP', 'PALMETTO', 2000),
 ('USLHH', 'LANGELOTH', 2001),
-('USLSM', 'LEE''S SUMMIT', 2002),
+('USLSM', 'LEE\'S SUMMIT', 2002),
 ('USMCC', 'MCCRORY', 2003),
 ('USPBI', 'WEST PALM BEACH', 2004),
 ('USPKL', 'PULASKI', 2005),
@@ -5448,7 +5422,7 @@ INSERT INTO `loct` (`isopol`, `pol`, `ID`) VALUES
 ('USMGR', 'MOULTRIE', 3492),
 ('USMRO', 'MOREO', 3493),
 ('USMZZ', 'MARION', 3494),
-('USOIN', 'O''BRIEN', 3495),
+('USOIN', 'O\'BRIEN', 3495),
 ('USPOP', 'PROSPECT', 3496),
 ('USPSB', 'CLEARFIELD', 3497),
 ('USGLA', 'GLACIER', 3498),
@@ -5561,7 +5535,7 @@ INSERT INTO `loct` (`isopol`, `pol`, `ID`) VALUES
 ('USCAO', 'CAIRO', 3604),
 ('USCDI', 'CEDARTOWN', 3605),
 ('USCIA', 'CENTERVILLE', 3606),
-('USCOE', 'COEUR D''ALENE', 3607),
+('USCOE', 'COEUR D\'ALENE', 3607),
 ('USCZA', 'CORNELIA', 3608),
 ('USDEE', 'DEERFIELD BEACH', 3609),
 ('USDEM', 'DECATUR', 3610),
@@ -5829,7 +5803,7 @@ INSERT INTO `loct` (`isopol`, `pol`, `ID`) VALUES
 ('SUROV', 'ROSTOV', 3872),
 ('TRKPU', 'KAPIKULE, EDIRNE', 3873),
 ('USACE', 'CAROL STREAM', 3874),
-('TOVAV', 'VAVA''U', 3875),
+('TOVAV', 'VAVA\'U', 3875),
 ('USABF', 'ALLENTOWN', 3876),
 ('USBBE', 'BOSCOBEL', 3877),
 ('USBCF', 'BELLE GLADE', 3878),
@@ -6191,7 +6165,7 @@ INSERT INTO `loct` (`isopol`, `pol`, `ID`) VALUES
 ('SATUU', 'TABUK', 4234),
 ('SESAN', 'SANDVIKEN', 4235),
 ('SENYN', 'NYNASHAMN', 4236),
-('TOTBU', 'NUKU''ALOFA', 4237),
+('TOTBU', 'NUKU\'ALOFA', 4237),
 ('TRFIN', 'FINIKE, ANTALYA', 4238),
 ('TZPMA', 'PEMBA', 4239),
 ('UAMKA', 'MOSTISKA', 4240),
@@ -6522,7 +6496,7 @@ INSERT INTO `loct` (`isopol`, `pol`, `ID`) VALUES
 ('CLOVL', 'OVALLE', 4565),
 ('COTCO', 'TUMACO', 4566),
 ('ITCAS', 'CASTELLAMMARE DI STABIA', 4567),
-('USAAE', 'SMITH''S BLUFF', 4568),
+('USAAE', 'SMITH\'S BLUFF', 4568),
 ('SEOSD', 'OSTERSUND', 4569),
 ('ISFAG', 'FAGURHOLSMYRI', 4570),
 ('ISHVK', 'HOLMAVIK', 4571),
@@ -7702,7 +7676,7 @@ INSERT INTO `loct` (`isopol`, `pol`, `ID`) VALUES
 ('JPISM', 'ISHINOMAKI, MIYAGI', 5744),
 ('JPNIC', 'NICHINAN, MIYAZAKI', 5745),
 ('SEMOR', 'MORBYLANGA', 5746),
-('TOHPA', 'HA''APAI', 5747),
+('TOHPA', 'HA\'APAI', 5747),
 ('JPKIN', 'KINWAN, OKINAWA', 5748),
 ('ITGEA', 'GELA', 5749),
 ('JPAXT', 'AKITA, AKITA', 5750),
@@ -8340,7 +8314,7 @@ INSERT INTO `loct` (`isopol`, `pol`, `ID`) VALUES
 ('COAUC', 'ARAUCA', 6382),
 ('GBAYF', 'AYCLIFFE', 6383),
 ('CABCO', 'BAIE COMEAU', 6384),
-('FR216', 'L''Estaque', 6385),
+('FR216', 'L\'Estaque', 6385),
 ('ESSFO', 'SAN FERNANDO', 6386),
 ('PHNAL', 'NALUNGGA/ILOILO', 6387),
 ('GBBLK', 'BLACKPOOL', 6388),
@@ -8740,7 +8714,7 @@ INSERT INTO `loct` (`isopol`, `pol`, `ID`) VALUES
 ('GBRMG', 'RAMSGATE', 6782),
 ('GBSHV', 'SHELL HAVEN', 6783),
 ('IRBKM', 'BANDAR KHOMEINI', 6784),
-('FRBEC', 'BEC D''AMBES', 6785),
+('FRBEC', 'BEC D\'AMBES', 6785),
 ('JPSMT', 'SHIMOTSU, WAKAYAMA', 6786),
 ('PHTLS', 'TOLOSA/TACLOBAN', 6787),
 ('GBNWI', 'NORWICH APT', 6788),
@@ -9005,7 +8979,7 @@ INSERT INTO `loct` (`isopol`, `pol`, `ID`) VALUES
 ('JPMYJ', 'MATSUYAMA, EHIME', 7046),
 ('ESALN', 'ALCANICES', 7047),
 ('CIBBE', 'BOUBELE', 7048),
-('GBBON', 'BO''NESS (BOROUGHSTONNESS)', 7049),
+('GBBON', 'BO\'NESS (BOROUGHSTONNESS)', 7049),
 ('CNHRB', 'HARBIN', 7050),
 ('GRHYD', 'HYDRA (IDHRA)', 7051),
 ('ITLIC', 'LICATA', 7052),
@@ -9024,7 +8998,7 @@ INSERT INTO `loct` (`isopol`, `pol`, `ID`) VALUES
 ('FRPRV', 'PRIVAS', 7065),
 ('GBYRK', 'YORK', 7066),
 ('DKSKS', 'SKRYDSTRUP', 7067),
-('FRLSO', 'LES SABLES D''OLONNE', 7068),
+('FRLSO', 'LES SABLES D\'OLONNE', 7068),
 ('GBBYX', 'BURNLEY', 7069),
 ('GBRMB', 'RAMSBOTTOM', 7070),
 ('FIDJU', 'DJUPKASTET', 7071),
@@ -9193,7 +9167,7 @@ INSERT INTO `loct` (`isopol`, `pol`, `ID`) VALUES
 ('CAFSI', 'FORT SIMPSON', 7234),
 ('GBWEM', 'WEMYSS BAY', 7235),
 ('GBBUS', 'BURTON STATHER/SCUNTHORPE', 7236),
-('GAKDJ', 'N''DJOLE', 7237),
+('GAKDJ', 'N\'DJOLE', 7237),
 ('IDNTI', 'BINTUNI', 7238),
 ('IDONI', 'MOANAMANI', 7239),
 ('IQRTM', 'RATAWI', 7240),
@@ -9900,7 +9874,7 @@ INSERT INTO `loct` (`isopol`, `pol`, `ID`) VALUES
 ('DKSTA', 'STAUNING', 7941),
 ('CAYGK', 'KINGSTON APT', 7942),
 ('GATCH', 'TCHIBANGA', 7943),
-('CNJMU', 'JI''AN', 7944),
+('CNJMU', 'JI\'AN', 7944),
 ('CACAQ', 'CARAQUET', 7945),
 ('CAXBR', 'BROCKVILLE APT', 7946),
 ('DKPAO', 'PADBORG', 7947),
@@ -10394,7 +10368,7 @@ INSERT INTO `loct` (`isopol`, `pol`, `ID`) VALUES
 ('ESMIX', 'MIRANDA DE EBRO', 8435),
 ('USWBO', 'WINNSBORO', 8436),
 ('GLJHS', 'HOLSTEINSBORG (SISIMIUT)', 8437),
-('BSWKR', 'WALKER''S CAY', 8438),
+('BSWKR', 'WALKER\'S CAY', 8438),
 ('EGCAI', 'CAIRO (= EL QAHIRA)', 8439),
 ('GBGUR', 'GOUROCK', 8440),
 ('CNSHE', 'SHENYANG', 8441),
@@ -10637,7 +10611,7 @@ INSERT INTO `loct` (`isopol`, `pol`, `ID`) VALUES
 ('FOFUG', 'FUGLAFIRDI (FUGLEFJORD)', 8678),
 ('FRPET', 'PETIT COURONNE', 8679),
 ('GBGRW', 'GROVE WHARVES/SCUNTHORPE', 8680),
-('GDSTG', 'SAINT GEORGE''S', 8681),
+('GDSTG', 'SAINT GEORGE\'S', 8681),
 ('FRPLG', 'LA PLAGNE', 8682),
 ('INCAM', 'CAMBAY', 8683),
 ('HNPEU', 'PUERTO LEMPIRA', 8684),
@@ -11014,7 +10988,7 @@ INSERT INTO `loct` (`isopol`, `pol`, `ID`) VALUES
 ('HNUII', 'UTILA', 9054),
 ('CRLIO', 'PUERTO LIMON', 9055),
 ('USXBP', 'BATH', 9056),
-('FRVAZ', 'VAL D''ISERE', 9057),
+('FRVAZ', 'VAL D\'ISERE', 9057),
 ('BSCOX', 'CONGO TOWN, ANDROS ISLAND', 9058),
 ('VUVLS', 'VALESDIR', 9059),
 ('USTNG', 'TRION', 9060),
@@ -11037,7 +11011,7 @@ INSERT INTO `loct` (`isopol`, `pol`, `ID`) VALUES
 ('USUQO', 'MAIDEN', 9077),
 ('USWSI', 'WILLSBORO', 9078),
 ('CAZST', 'STEWART APT', 9079),
-('FRAHZ', 'ALPE D''HUEZ, L''', 9080),
+('FRAHZ', 'ALPE D\'HUEZ, L\'', 9080),
 ('USXEF', 'COHASSET', 9081),
 ('USTKA', 'TALKEETNA', 9082),
 ('USMJY', 'MOUNT JOY', 9083),
@@ -11765,7 +11739,7 @@ INSERT INTO `loct` (`isopol`, `pol`, `ID`) VALUES
 ('USHLA', 'HEALDSBURG', 9805),
 ('USDXR', 'DANBURY', 9806),
 ('USEGP', 'EAGLE PASS', 9807),
-('BSATC', 'ARTHUR''S TOWN, CAT ISLAND', 9808),
+('BSATC', 'ARTHUR\'S TOWN, CAT ISLAND', 9808),
 ('CALOH', 'LONG HARBOUR', 9809),
 ('CFBOP', 'BOUAR', 9810),
 ('YUKOT', 'KOTOR', 9811),
@@ -13338,7 +13312,7 @@ INSERT INTO `loct` (`isopol`, `pol`, `ID`) VALUES
 ('USLDV', 'LANDISVILLE', 11377),
 ('USFMN', 'FARMINGTON', 11378),
 ('USEWT', 'ELLSWORTH', 11379),
-('PGESA', 'ESA''ALA', 11380),
+('PGESA', 'ESA\'ALA', 11380),
 ('PGKDE', 'KOROBA', 11381),
 ('PAJQE', 'JAQUE', 11382),
 ('PEATA', 'ANTA', 11383),
@@ -13995,7 +13969,7 @@ INSERT INTO `loct` (`isopol`, `pol`, `ID`) VALUES
 ('PHCRG', 'CARAGA/MATI', 12034),
 ('USMRT', 'MORRISTON', 12035),
 ('USGJT', 'GRAND JUNCTION', 12036),
-('USLAJ', 'L''ANSE', 12037),
+('USLAJ', 'L\'ANSE', 12037),
 ('USFMF', 'FARMINGTON', 12038),
 ('PHJAS', 'JASAAN/CAGAYAN DE ORO', 12039),
 ('PHLPA', 'LIPA', 12040),
@@ -16586,7 +16560,7 @@ INSERT INTO `loct` (`isopol`, `pol`, `ID`) VALUES
 ('USNOT', 'NOVATO', 14623),
 ('USNRS', 'IMPERIAL BEACH', 14624),
 ('USUSP', 'UNION SPRINGS', 14625),
-('YESAH', 'SANA''A', 14626),
+('YESAH', 'SANA\'A', 14626),
 ('USXFK', 'FREMONT', 14627),
 ('USMOB', 'MOBILE', 14628),
 ('USMHK', 'MANHATTAN', 14629),
@@ -17125,7 +17099,7 @@ INSERT INTO `loct` (`isopol`, `pol`, `ID`) VALUES
 ('BASJJ', 'SARAJEVO', 15162),
 ('BDCGP', 'CHITTAGONG', 15163),
 ('BDCLA', 'COMILLA', 15164),
-('BDCXB', 'COX''S BAZAAR', 15165),
+('BDCXB', 'COX\'S BAZAAR', 15165),
 ('BDKHL', 'KHULNA', 15166),
 ('BDNAR', 'NARAYANGANJ', 15167),
 ('BEKJK', 'KORTRIJK', 15168),
@@ -17250,16 +17224,14 @@ INSERT INTO `loct` (`isopol`, `pol`, `ID`) VALUES
 -- Table structure for table `main`
 --
 
-CREATE TABLE IF NOT EXISTS `main` (
-  `ID` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `main` (
+  `ID` int(11) NOT NULL,
   `MAIN_NO` int(11) NOT NULL,
-  `MAIN_NAME` varchar(50) CHARACTER SET utf32 NOT NULL,
+  `MAIN_NAME` varchar(50) CHARACTER SET utf32 COLLATE utf32_general_ci NOT NULL,
   `MAIN_BAND_NO` int(11) DEFAULT NULL,
   `company_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  PRIMARY KEY (`MAIN_NO`),
-  UNIQUE KEY `ID` (`ID`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=17 ;
+  `user_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Dumping data for table `main`
@@ -17276,8 +17248,8 @@ INSERT INTO `main` (`ID`, `MAIN_NO`, `MAIN_NAME`, `MAIN_BAND_NO`, `company_id`, 
 -- Table structure for table `mast`
 --
 
-CREATE TABLE IF NOT EXISTS `mast` (
-  `mast_vslvoy` int(11) NOT NULL DEFAULT '0',
+CREATE TABLE `mast` (
+  `mast_vslvoy` int(11) NOT NULL DEFAULT 0,
   `mast_updateperson` varchar(50) DEFAULT '',
   `mast_blno` varchar(30) NOT NULL,
   `mast_cno` varchar(100) NOT NULL DEFAULT '-',
@@ -17285,11 +17257,11 @@ CREATE TABLE IF NOT EXISTS `mast` (
   `MAST_POL` varchar(50) NOT NULL,
   `mast_ctype` varchar(100) DEFAULT 'FCL',
   `MAST_D_DATE` varchar(55) DEFAULT NULL,
-  `MAST_D_SERIAL` bigint(20) NOT NULL DEFAULT '0',
+  `MAST_D_SERIAL` bigint(20) NOT NULL DEFAULT 0,
   `MAST_emptyDATE` date DEFAULT NULL,
   `MAST_WEIGHT` varchar(20) NOT NULL,
-  `MAST_KEYNO` double NOT NULL DEFAULT '0',
-  `mast_nweight` bigint(20) NOT NULL DEFAULT '0',
+  `MAST_KEYNO` double NOT NULL DEFAULT 0,
+  `mast_nweight` bigint(20) NOT NULL DEFAULT 0,
   `MAST_shipper` varchar(200) NOT NULL DEFAULT '-',
   `mast_notify` varchar(200) NOT NULL DEFAULT '-',
   `mast_cargo` varchar(150) NOT NULL DEFAULT 'G/C',
@@ -17298,14 +17270,14 @@ CREATE TABLE IF NOT EXISTS `mast` (
   `MAST_PERSON` varchar(50) DEFAULT NULL,
   `MAST_DESC` varchar(500) DEFAULT NULL,
   `MAST_KIND` varchar(10) NOT NULL DEFAULT '-',
-  `CREATTIME` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `mast_status` int(11) NOT NULL DEFAULT '0',
+  `CREATTIME` timestamp NOT NULL DEFAULT current_timestamp(),
+  `mast_status` int(11) NOT NULL DEFAULT 0,
   `mast_mark` varchar(100) DEFAULT 'mark',
-  `mast_dem_serial` bigint(20) NOT NULL DEFAULT '0',
+  `mast_dem_serial` bigint(20) NOT NULL DEFAULT 0,
   `mast_isopol` varchar(6) NOT NULL DEFAULT 'isopol',
   `mast_lotno` varchar(50) NOT NULL DEFAULT 'SQ',
   `mast_csize` varchar(5) NOT NULL DEFAULT '20GP',
-  `MAST_ID` double NOT NULL AUTO_INCREMENT,
+  `MAST_ID` double NOT NULL,
   `rcvc` varchar(10) NOT NULL DEFAULT 'no',
   `rstr` varchar(10) NOT NULL DEFAULT 'no',
   `rcvc_rstr_date` date DEFAULT NULL,
@@ -17315,32 +17287,31 @@ CREATE TABLE IF NOT EXISTS `mast` (
   `rcvs` varchar(10) NOT NULL DEFAULT 'no',
   `rstf` varchar(10) NOT NULL DEFAULT 'no',
   `rcvs_rstf_date` date DEFAULT NULL,
-  `booking` int(11) NOT NULL DEFAULT '0',
+  `booking` int(11) NOT NULL DEFAULT 0,
   `sos` varchar(100) NOT NULL DEFAULT '0',
   `pol_terminal` varchar(100) NOT NULL DEFAULT '0',
   `seal_no` varchar(100) NOT NULL DEFAULT '0',
-  `inventoryflag` int(11) NOT NULL DEFAULT '0',
+  `inventoryflag` int(11) NOT NULL DEFAULT 0,
   `partendormaster` varchar(100) NOT NULL DEFAULT '-',
   `mast_seal` varchar(100) NOT NULL DEFAULT '-',
-  `transit` int(11) NOT NULL DEFAULT '23',
+  `transit` int(11) NOT NULL DEFAULT 23,
   `load_full_empty_date` date DEFAULT NULL,
-  `expflag` int(11) NOT NULL DEFAULT '0',
-  `rcvcrstrdays` int(11) NOT NULL DEFAULT '0',
-  `sntssstfdays` int(11) NOT NULL DEFAULT '0',
-  `rcvsrstfdays` int(11) NOT NULL DEFAULT '0',
+  `expflag` int(11) NOT NULL DEFAULT 0,
+  `rcvcrstrdays` int(11) NOT NULL DEFAULT 0,
+  `sntssstfdays` int(11) NOT NULL DEFAULT 0,
+  `rcvsrstfdays` int(11) NOT NULL DEFAULT 0,
   `del_date` date DEFAULT NULL,
-  `rcvcamount` double NOT NULL DEFAULT '0',
-  `sntsamount` double NOT NULL DEFAULT '0',
-  `rcvsamount` double NOT NULL DEFAULT '0',
-  `mast_dem_duration` int(11) NOT NULL DEFAULT '0',
-  `mast_dem_amount` double NOT NULL DEFAULT '0',
-  `mast_dem_free` int(11) NOT NULL DEFAULT '0',
-  `line` int(11) NOT NULL DEFAULT '1',
+  `rcvcamount` double NOT NULL DEFAULT 0,
+  `sntsamount` double NOT NULL DEFAULT 0,
+  `rcvsamount` double NOT NULL DEFAULT 0,
+  `mast_dem_duration` int(11) NOT NULL DEFAULT 0,
+  `mast_dem_amount` double NOT NULL DEFAULT 0,
+  `mast_dem_free` int(11) NOT NULL DEFAULT 0,
+  `line` int(11) NOT NULL DEFAULT 1,
   `del_date_time` varchar(50) NOT NULL DEFAULT '-',
   `updated_at` datetime DEFAULT NULL,
-  `company_id` int(11) NOT NULL,
-  PRIMARY KEY (`MAST_ID`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=341 ;
+  `company_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `mast`
@@ -17411,13 +17382,11 @@ INSERT INTO `mast` (`mast_vslvoy`, `mast_updateperson`, `mast_blno`, `mast_cno`,
 --
 -- Triggers `mast`
 --
-DROP TRIGGER IF EXISTS `mast_before_update`;
-DELIMITER //
-CREATE TRIGGER `mast_before_update` BEFORE UPDATE ON `mast`
- FOR EACH ROW BEGIN
+DELIMITER $$
+CREATE TRIGGER `mast_before_update` BEFORE UPDATE ON `mast` FOR EACH ROW BEGIN
   SET NEW.updated_at = NOW();
 END
-//
+$$
 DELIMITER ;
 
 -- --------------------------------------------------------
@@ -17426,15 +17395,14 @@ DELIMITER ;
 -- Table structure for table `subband`
 --
 
-CREATE TABLE IF NOT EXISTS `subband` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `subband` (
+  `id` bigint(20) NOT NULL,
   `subbno` int(11) NOT NULL,
-  `subbname` varchar(50) CHARACTER SET utf32 NOT NULL,
+  `subbname` varchar(50) CHARACTER SET utf32 COLLATE utf32_general_ci NOT NULL,
   `subb_band_no` decimal(6,0) DEFAULT NULL,
   `company_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=4 ;
+  `user_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `subband`
@@ -17450,18 +17418,16 @@ INSERT INTO `subband` (`id`, `subbno`, `subbname`, `subb_band_no`, `company_id`,
 -- Table structure for table `submain`
 --
 
-CREATE TABLE IF NOT EXISTS `submain` (
-  `ID` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `submain` (
+  `ID` int(11) NOT NULL,
   `SUBMAIN_NO` bigint(11) NOT NULL,
-  `SUBMAIN_NAME` varchar(240) CHARACTER SET utf8 NOT NULL,
+  `SUBMAIN_NAME` varchar(240) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `SUBMAIN_MAIN_NO` int(11) DEFAULT NULL,
-  `SUBMAIN_STATUS` int(11) DEFAULT '0',
-  `clrno` int(11) NOT NULL DEFAULT '0',
+  `SUBMAIN_STATUS` int(11) DEFAULT 0,
+  `clrno` int(11) NOT NULL DEFAULT 0,
   `company_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  PRIMARY KEY (`SUBMAIN_NO`),
-  UNIQUE KEY `ID` (`ID`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=752 ;
+  `user_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Dumping data for table `submain`
@@ -17480,15 +17446,9 @@ INSERT INTO `submain` (`ID`, `SUBMAIN_NO`, `SUBMAIN_NAME`, `SUBMAIN_MAIN_NO`, `S
 -- Table structure for table `sysyear`
 --
 
-CREATE TABLE IF NOT EXISTS `sysyear` (
-  `SYSTEMYEAR` int(11) NOT NULL,
-  PRIMARY KEY (`SYSTEMYEAR`),
-  UNIQUE KEY `SYSTEMYEAR` (`SYSTEMYEAR`),
-  KEY `SYSTEMYEAR_2` (`SYSTEMYEAR`),
-  KEY `SYSTEMYEAR_3` (`SYSTEMYEAR`),
-  KEY `SYSTEMYEAR_4` (`SYSTEMYEAR`),
-  KEY `SYSTEMYEAR_5` (`SYSTEMYEAR`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+CREATE TABLE `sysyear` (
+  `SYSTEMYEAR` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Dumping data for table `sysyear`
@@ -17503,31 +17463,28 @@ INSERT INTO `sysyear` (`SYSTEMYEAR`) VALUES
 -- Table structure for table `users`
 --
 
-CREATE TABLE IF NOT EXISTS `users` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+CREATE TABLE `users` (
+  `id` int(10) UNSIGNED NOT NULL,
   `username` varchar(100) NOT NULL,
   `email` varchar(255) DEFAULT NULL,
   `password` varchar(255) NOT NULL,
   `role` enum('admin','user','company_admin') DEFAULT 'user',
-  `company_id` int(10) unsigned NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `permissions` text,
-  `screens` text,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `username_company` (`username`,`company_id`),
-  KEY `company_id` (`company_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=24 ;
+  `company_id` int(10) UNSIGNED NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `permissions` text DEFAULT NULL,
+  `screens` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Dumping data for table `users`
 --
 
 INSERT INTO `users` (`id`, `username`, `email`, `password`, `role`, `company_id`, `created_at`, `permissions`, `screens`) VALUES
-(1, 'admin', NULL, '$2b$10$q70KByekgxY.JOKT/o3wT.0/j81qvM1WhFr7TAgZozG0xavXGC5Tu', 'admin', 1, '2025-10-01 12:11:43', '{"Accounts":{"view":true,"delete":true,"edit":true},"Journal":{"view":true,"delete":true,"edit":true},"Reports":{"view":true,"delete":true,"edit":true},"Users":{"view":true,"delete":true,"edit":true},"AccountsBase":{"view":true,"delete":true,"edit":true},"AccountsHigh":{"view":true,"edit":true,"delete":true},"AccountsBands":{"view":true,"edit":true,"delete":true}}', '["Accounts","Journal","AccountsBase","AccountsHigh","AccountsBands","Users","Reports"]'),
-(9, 'moh', NULL, '$2b$10$oUM./SJUgnkfG1J0OQ8eW.sj7C49rRd0iLeao.smDPqnPzQwthQ7i', 'user', 1, '2025-10-07 09:53:10', '{"view":false,"edit":false,"delete":true,"Journal":{"edit":true,"view":true,"delete":true}}', '["Journal"]'),
-(10, 'abeer', NULL, '$2b$10$KoiQAzNCpxk.iYlYWkfYR.6/COabSU6kBj/KhV0jvVLh55iEE3Z1a', 'user', 1, '2025-10-07 09:53:39', '{"view":false,"edit":true,"delete":false,"Accounts":{"edit":false},"AccountsBase":{"view":true,"edit":true,"delete":false},"AccountsHigh":{"view":true,"edit":true,"delete":true},"AccountsBands":{"view":true,"edit":true,"delete":true},"Users":{"view":true,"edit":true,"delete":true},"Reports":{"view":true}}', '["Accounts","Reports"]'),
-(22, 'admin', NULL, '$2b$10$lOQZLmeESjbC7l.Vnsn5Zew1IUz8SDa94PM1wuWjFCReSmwxrmyA2', 'user', 2, '2025-10-09 12:36:08', '{"view":true,"edit":false,"Journal":{"view":true,"edit":true,"delete":true},"AccountsBase":{"view":true,"edit":true,"delete":true},"AccountsHigh":{"view":true,"edit":true,"delete":true},"AccountsBands":{"view":true,"edit":true,"delete":true},"Users":{"view":true,"edit":true,"delete":true}}', '["Journal","AccountsBase","AccountsHigh","AccountsBands","Users"]'),
-(23, 'abeer', NULL, '$2b$10$.RuK3NIXQt59WqEtWQPaTeoM9SWfJJSKnvfFFC5Jn5CxJ3ocJymGe', 'user', 2, '2025-10-12 10:57:34', '{"view":true,"edit":false,"Journal":{"view":true,"edit":true,"delete":true}}', '["Journal"]');
+(1, 'admin', NULL, '$2b$10$q70KByekgxY.JOKT/o3wT.0/j81qvM1WhFr7TAgZozG0xavXGC5Tu', 'admin', 1, '2025-10-01 12:11:43', '{\"Accounts\":{\"view\":true,\"delete\":true,\"edit\":true},\"Journal\":{\"view\":true,\"delete\":true,\"edit\":true},\"Reports\":{\"view\":true,\"delete\":true,\"edit\":true},\"Users\":{\"view\":true,\"delete\":true,\"edit\":true},\"AccountsBase\":{\"view\":true,\"delete\":true,\"edit\":true},\"AccountsHigh\":{\"view\":true,\"edit\":true,\"delete\":true},\"AccountsBands\":{\"view\":true,\"edit\":true,\"delete\":true}}', '[\"Accounts\",\"Journal\",\"AccountsBase\",\"AccountsHigh\",\"AccountsBands\",\"Users\",\"Reports\"]'),
+(9, 'moh', NULL, '$2b$10$oUM./SJUgnkfG1J0OQ8eW.sj7C49rRd0iLeao.smDPqnPzQwthQ7i', 'user', 1, '2025-10-07 09:53:10', '{\"view\":false,\"edit\":false,\"delete\":true,\"Journal\":{\"edit\":true,\"view\":true,\"delete\":true}}', '[\"Journal\"]'),
+(10, 'abeer', NULL, '$2b$10$KoiQAzNCpxk.iYlYWkfYR.6/COabSU6kBj/KhV0jvVLh55iEE3Z1a', 'user', 1, '2025-10-07 09:53:39', '{\"view\":false,\"edit\":true,\"delete\":false,\"Accounts\":{\"edit\":false},\"AccountsBase\":{\"view\":true,\"edit\":true,\"delete\":false},\"AccountsHigh\":{\"view\":true,\"edit\":true,\"delete\":true},\"AccountsBands\":{\"view\":true,\"edit\":true,\"delete\":true},\"Users\":{\"view\":true,\"edit\":true,\"delete\":true},\"Reports\":{\"view\":true}}', '[\"Accounts\",\"Reports\"]'),
+(22, 'admin', NULL, '$2b$10$lOQZLmeESjbC7l.Vnsn5Zew1IUz8SDa94PM1wuWjFCReSmwxrmyA2', 'user', 2, '2025-10-09 12:36:08', '{\"view\":true,\"edit\":false,\"Journal\":{\"view\":true,\"edit\":true,\"delete\":true},\"AccountsBase\":{\"view\":true,\"edit\":true,\"delete\":true},\"AccountsHigh\":{\"view\":true,\"edit\":true,\"delete\":true},\"AccountsBands\":{\"view\":true,\"edit\":true,\"delete\":true},\"Users\":{\"view\":true,\"edit\":true,\"delete\":true}}', '[\"Journal\",\"AccountsBase\",\"AccountsHigh\",\"AccountsBands\",\"Users\"]'),
+(23, 'abeer', NULL, '$2b$10$.RuK3NIXQt59WqEtWQPaTeoM9SWfJJSKnvfFFC5Jn5CxJ3ocJymGe', 'user', 2, '2025-10-12 10:57:34', '{\"view\":true,\"edit\":false,\"Journal\":{\"view\":true,\"edit\":true,\"delete\":true}}', '[\"Journal\"]');
 
 -- --------------------------------------------------------
 
@@ -17535,15 +17492,15 @@ INSERT INTO `users` (`id`, `username`, `email`, `password`, `role`, `company_id`
 -- Table structure for table `vesselvoyages`
 --
 
-CREATE TABLE IF NOT EXISTS `vesselvoyages` (
-  `id` int(11) NOT NULL DEFAULT '0',
+CREATE TABLE `vesselvoyages` (
+  `id` int(11) NOT NULL DEFAULT 0,
   `invoice_no` bigint(20) NOT NULL,
   `vesseldate` date NOT NULL,
   `vessel` varchar(50) NOT NULL,
   `voyno` varchar(50) NOT NULL,
   `remarks` varchar(100) DEFAULT NULL,
   `user` varchar(29) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 -- --------------------------------------------------------
 
@@ -17551,14 +17508,14 @@ CREATE TABLE IF NOT EXISTS `vesselvoyages` (
 -- Table structure for table `vouchers`
 --
 
-CREATE TABLE IF NOT EXISTS `vouchers` (
+CREATE TABLE `vouchers` (
   `voucherNo` int(11) DEFAULT NULL,
   `acc` varchar(50) DEFAULT NULL,
   `accName` varchar(100) DEFAULT NULL,
   `debit` double DEFAULT NULL,
   `credit` double DEFAULT NULL,
   `description` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- --------------------------------------------------------
 
@@ -17566,19 +17523,18 @@ CREATE TABLE IF NOT EXISTS `vouchers` (
 -- Table structure for table `voyage`
 --
 
-CREATE TABLE IF NOT EXISTS `voyage` (
+CREATE TABLE `voyage` (
   `serial` int(11) NOT NULL,
   `voyageno` varchar(50) NOT NULL,
   `vessel` varchar(50) NOT NULL,
   `voydate` date NOT NULL,
   `voyfrom` varchar(50) NOT NULL,
-  `voycost` double NOT NULL DEFAULT '0',
+  `voycost` double NOT NULL DEFAULT 0,
   `user` varchar(50) NOT NULL,
   `callsign` varchar(50) NOT NULL DEFAULT 'callsign',
   `loyds` varchar(50) DEFAULT 'loyds',
-  `customsvoy` varchar(50) NOT NULL DEFAULT 'CV',
-  PRIMARY KEY (`serial`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `customsvoy` varchar(50) NOT NULL DEFAULT 'CV'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `voyage`
@@ -17604,23 +17560,22 @@ INSERT INTO `voyage` (`serial`, `voyageno`, `vessel`, `voydate`, `voyfrom`, `voy
 -- Table structure for table `voys`
 --
 
-CREATE TABLE IF NOT EXISTS `voys` (
+CREATE TABLE `voys` (
   `serial` int(11) NOT NULL,
   `toport` varchar(30) DEFAULT 'Port Sudan',
   `voyageno` varchar(50) NOT NULL,
   `vessel` varchar(50) NOT NULL,
   `voydate` varchar(55) NOT NULL,
   `voyfrom` varchar(50) NOT NULL,
-  `voycost` double NOT NULL DEFAULT '0',
+  `voycost` double NOT NULL DEFAULT 0,
   `user` varchar(50) NOT NULL,
   `callsign` varchar(50) NOT NULL DEFAULT 'callsign',
   `loyds` varchar(50) DEFAULT 'loyds',
   `customsvoy` varchar(50) NOT NULL DEFAULT 'CV',
   `saildate` date NOT NULL,
   `voydate_time` varchar(50) NOT NULL DEFAULT '-',
-  `updated_at` datetime DEFAULT NULL,
-  PRIMARY KEY (`serial`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `updated_at` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `voys`
@@ -17633,13 +17588,11 @@ INSERT INTO `voys` (`serial`, `toport`, `voyageno`, `vessel`, `voydate`, `voyfro
 --
 -- Triggers `voys`
 --
-DROP TRIGGER IF EXISTS `voys_before_update`;
-DELIMITER //
-CREATE TRIGGER `voys_before_update` BEFORE UPDATE ON `voys`
- FOR EACH ROW BEGIN
+DELIMITER $$
+CREATE TRIGGER `voys_before_update` BEFORE UPDATE ON `voys` FOR EACH ROW BEGIN
   SET NEW.updated_at = NOW();
 END
-//
+$$
 DELIMITER ;
 
 -- --------------------------------------------------------
@@ -17648,12 +17601,10 @@ DELIMITER ;
 -- Table structure for table `vslreg`
 --
 
-CREATE TABLE IF NOT EXISTS `vslreg` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(50) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+CREATE TABLE `vslreg` (
+  `id` int(11) NOT NULL,
+  `name` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `vslreg`
@@ -17668,13 +17619,12 @@ INSERT INTO `vslreg` (`id`, `name`) VALUES
 -- Table structure for table `yeartopno`
 --
 
-CREATE TABLE IF NOT EXISTS `yeartopno` (
-  `TOPNO` int(11) NOT NULL DEFAULT '1',
-  `SYSYEAR` int(11) NOT NULL DEFAULT '2025',
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `company_id` int(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=26 ;
+CREATE TABLE `yeartopno` (
+  `TOPNO` int(11) NOT NULL DEFAULT 1,
+  `SYSYEAR` int(11) NOT NULL DEFAULT 2025,
+  `id` bigint(20) NOT NULL,
+  `company_id` int(11) NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Dumping data for table `yeartopno`
@@ -17703,6 +17653,363 @@ INSERT INTO `yeartopno` (`TOPNO`, `SYSYEAR`, `id`, `company_id`) VALUES
 (14, 2025, 25, 1);
 
 --
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `balancesheet`
+--
+ALTER TABLE `balancesheet`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `band`
+--
+ALTER TABLE `band`
+  ADD PRIMARY KEY (`BAND_NO`);
+
+--
+-- Indexes for table `clearers`
+--
+ALTER TABLE `clearers`
+  ADD PRIMARY KEY (`clearerid`);
+
+--
+-- Indexes for table `clients`
+--
+ALTER TABLE `clients`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `company`
+--
+ALTER TABLE `company`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `dailymovement`
+--
+ALTER TABLE `dailymovement`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `delivery`
+--
+ALTER TABLE `delivery`
+  ADD PRIMARY KEY (`del_serial`);
+
+--
+-- Indexes for table `demurrage`
+--
+ALTER TABLE `demurrage`
+  ADD PRIMARY KEY (`dem_serial`);
+
+--
+-- Indexes for table `detail`
+--
+ALTER TABLE `detail`
+  ADD PRIMARY KEY (`DETAIL_NO`),
+  ADD KEY `fk_submain_detail` (`DETAIL_SUBMAIN_NO`);
+
+--
+-- Indexes for table `detention`
+--
+ALTER TABLE `detention`
+  ADD PRIMARY KEY (`dem_serial`);
+
+--
+-- Indexes for table `dsetting`
+--
+ALTER TABLE `dsetting`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `edi_hash_log`
+--
+ALTER TABLE `edi_hash_log`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `edi_lock`
+--
+ALTER TABLE `edi_lock`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `ex_manifest`
+--
+ALTER TABLE `ex_manifest`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `gate_in`
+--
+ALTER TABLE `gate_in`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `gdelivery`
+--
+ALTER TABLE `gdelivery`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `del_serial` (`del_serial`),
+  ADD UNIQUE KEY `co_del` (`co_del`);
+
+--
+-- Indexes for table `gdelset`
+--
+ALTER TABLE `gdelset`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `gmanifest`
+--
+ALTER TABLE `gmanifest`
+  ADD PRIMARY KEY (`mast_id`);
+
+--
+-- Indexes for table `htc`
+--
+ALTER TABLE `htc`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `income`
+--
+ALTER TABLE `income`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `invoice`
+--
+ALTER TABLE `invoice`
+  ADD PRIMARY KEY (`INVOICE_NO`);
+
+--
+-- Indexes for table `isopol`
+--
+ALTER TABLE `isopol`
+  ADD PRIMARY KEY (`ISOPOL`);
+
+--
+-- Indexes for table `journal`
+--
+ALTER TABLE `journal`
+  ADD PRIMARY KEY (`IDAUTO`);
+
+--
+-- Indexes for table `loct`
+--
+ALTER TABLE `loct`
+  ADD PRIMARY KEY (`ID`);
+
+--
+-- Indexes for table `main`
+--
+ALTER TABLE `main`
+  ADD PRIMARY KEY (`MAIN_NO`),
+  ADD UNIQUE KEY `ID` (`ID`);
+
+--
+-- Indexes for table `mast`
+--
+ALTER TABLE `mast`
+  ADD PRIMARY KEY (`MAST_ID`);
+
+--
+-- Indexes for table `subband`
+--
+ALTER TABLE `subband`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `submain`
+--
+ALTER TABLE `submain`
+  ADD PRIMARY KEY (`SUBMAIN_NO`),
+  ADD UNIQUE KEY `ID` (`ID`);
+
+--
+-- Indexes for table `sysyear`
+--
+ALTER TABLE `sysyear`
+  ADD PRIMARY KEY (`SYSTEMYEAR`),
+  ADD UNIQUE KEY `SYSTEMYEAR` (`SYSTEMYEAR`),
+  ADD KEY `SYSTEMYEAR_2` (`SYSTEMYEAR`),
+  ADD KEY `SYSTEMYEAR_3` (`SYSTEMYEAR`),
+  ADD KEY `SYSTEMYEAR_4` (`SYSTEMYEAR`),
+  ADD KEY `SYSTEMYEAR_5` (`SYSTEMYEAR`);
+
+--
+-- Indexes for table `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `username_company` (`username`,`company_id`),
+  ADD KEY `company_id` (`company_id`);
+
+--
+-- Indexes for table `voyage`
+--
+ALTER TABLE `voyage`
+  ADD PRIMARY KEY (`serial`);
+
+--
+-- Indexes for table `voys`
+--
+ALTER TABLE `voys`
+  ADD PRIMARY KEY (`serial`);
+
+--
+-- Indexes for table `vslreg`
+--
+ALTER TABLE `vslreg`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `name` (`name`);
+
+--
+-- Indexes for table `yeartopno`
+--
+ALTER TABLE `yeartopno`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `balancesheet`
+--
+ALTER TABLE `balancesheet`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=80;
+
+--
+-- AUTO_INCREMENT for table `clearers`
+--
+ALTER TABLE `clearers`
+  MODIFY `clearerid` double NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=576;
+
+--
+-- AUTO_INCREMENT for table `clients`
+--
+ALTER TABLE `clients`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `company`
+--
+ALTER TABLE `company`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `dailymovement`
+--
+ALTER TABLE `dailymovement`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `detail`
+--
+ALTER TABLE `detail`
+  MODIFY `DETAIL_NO` bigint(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `edi_hash_log`
+--
+ALTER TABLE `edi_hash_log`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=69;
+
+--
+-- AUTO_INCREMENT for table `ex_manifest`
+--
+ALTER TABLE `ex_manifest`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
+
+--
+-- AUTO_INCREMENT for table `gate_in`
+--
+ALTER TABLE `gate_in`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- AUTO_INCREMENT for table `gdelivery`
+--
+ALTER TABLE `gdelivery`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+
+--
+-- AUTO_INCREMENT for table `gdelset`
+--
+ALTER TABLE `gdelset`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `gmanifest`
+--
+ALTER TABLE `gmanifest`
+  MODIFY `mast_id` double NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
+
+--
+-- AUTO_INCREMENT for table `income`
+--
+ALTER TABLE `income`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=324;
+
+--
+-- AUTO_INCREMENT for table `journal`
+--
+ALTER TABLE `journal`
+  MODIFY `IDAUTO` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=79;
+
+--
+-- AUTO_INCREMENT for table `loct`
+--
+ALTER TABLE `loct`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15286;
+
+--
+-- AUTO_INCREMENT for table `main`
+--
+ALTER TABLE `main`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+
+--
+-- AUTO_INCREMENT for table `mast`
+--
+ALTER TABLE `mast`
+  MODIFY `MAST_ID` double NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=341;
+
+--
+-- AUTO_INCREMENT for table `subband`
+--
+ALTER TABLE `subband`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `submain`
+--
+ALTER TABLE `submain`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=752;
+
+--
+-- AUTO_INCREMENT for table `users`
+--
+ALTER TABLE `users`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+
+--
+-- AUTO_INCREMENT for table `vslreg`
+--
+ALTER TABLE `vslreg`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `yeartopno`
+--
+ALTER TABLE `yeartopno`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+
+--
 -- Constraints for dumped tables
 --
 
@@ -17717,14 +18024,7 @@ ALTER TABLE `detail`
 --
 ALTER TABLE `users`
   ADD CONSTRAINT `users_ibfk_1` FOREIGN KEY (`company_id`) REFERENCES `company` (`id`) ON DELETE CASCADE;
-
-DELIMITER $$
---
--- Events
---
-CREATE DEFINER=`root`@`localhost` EVENT `delband` ON SCHEDULE AT '2017-04-28 15:31:00' ON COMPLETION PRESERVE DISABLE DO delete from band$$
-
-DELIMITER ;
+COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

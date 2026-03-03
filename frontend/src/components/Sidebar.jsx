@@ -32,7 +32,7 @@ function Sidebar({ lang, setLang, navigate }) {
   const availableReports = [
     { key: "balanceSheet", name: lang === "ar" ? "الميزانية العمومية" : "Balance Sheet" },
     { key: "accountStatement", name: lang === "ar" ? "كشف حساب" : "Account Statement" },
-    { key: "trialbalance", name: lang === "ar" ? "ميزان المراجعة" : "Trial Balance" },
+    { key: "trialBalance", name: lang === "ar" ? "ميزان المراجعة" : "Trial Balance" },
   ];
 
   const toggleLanguage = () => {
@@ -136,11 +136,14 @@ function Sidebar({ lang, setLang, navigate }) {
             {showReports && (
               <ul className="submenu-items">
                 {availableReports
-                  .filter((r) => permissions.Reports?.[r.name]) // ✅ فقط التقارير المسموح بها
+                  .filter((r) => permissions.Reports?.[r.key]) // ✅ فقط التقارير المسموح بها
                   .map((r) => (
                     <li
                       key={r.key}
-                      onClick={() => handleNavigate(`/report/${r.key}`, "Reports")}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleNavigate(`/report/${r.key}`, "Reports");
+                      }}
                     >
                       {r.name}
                     </li>

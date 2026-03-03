@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react";
 import api from "../../api";
 import html2pdf from "html2pdf.js";
 import "./BalanceSheet.css";
-import logoImg from "./logo.jpg";
 
 export default function BalanceSheet({ lang }) {
   const [subbands, setSubbands] = useState([]);
+  const [companyDetails, setCompanyDetails] = useState(null);
 
   const t = {
     ar: { title: "الميزانية العمومية", subband: "الفئة الفرعية", total: "الإجمالي", export: "تصدير PDF" },
@@ -13,17 +13,18 @@ export default function BalanceSheet({ lang }) {
   }[lang || "ar"];
 
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await api.get("/reports/balance-sheet");
+        setSubbands(res.data.subbands || []);
+        const companyRes = await api.get("/company-details");
+        setCompanyDetails(companyRes.data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
     fetchData();
   }, []);
-
-  const fetchData = async () => {
-    try {
-      const res = await api.get("/reports/balance-sheet");
-      setSubbands(res.data.subbands || []);
-    } catch (err) {
-      console.error(err);
-    }
-  };
 
   const calcTotal = (arr) =>
     Array.isArray(arr) ? arr.reduce((a, b) => a + (b.amount || 0), 0) : 0;
@@ -31,15 +32,20 @@ export default function BalanceSheet({ lang }) {
 const printPDF = () => {
   const element = document.createElement("div");
 
+  const headerContent = companyDetails
+    ? `<div style="text-align: ${lang === "ar" ? "right" : "left"};">
+         <div style="font-size: 22px; font-weight: bold;">${companyDetails.name}</div>
+         <div>${companyDetails.location}</div>
+       </div>`
+    : "";
+
   element.innerHTML = `
     <div style="font-family: 'Cairo', Arial, sans-serif; padding: 30px; color: #153F4D;">
       
     
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; padding-bottom: 15px;">
-        <div>
-          <img src="${logoImg}" alt="Logo" style="height:80px; width:auto;" />
-        </div>
-        <div style="font-size: 26px; font-weight: 700; text-align: right;">
+        ${headerContent}
+        <div style="font-size: 26px; font-weight: 700; text-align: ${lang === "ar" ? "left" : "right"};">
           ${t.title}
         </div>
       </div>

@@ -1,13 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaGlobe } from "react-icons/fa";
 import api from "../api";
 
-export default function Login({ navigate }) {
+export default function Login({ navigate, onLogin }) {
   const [companyName, setCompanyName] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [lang, setLang] = useState("ar");
+
+  useEffect(() => {
+    const savedCompanyName = localStorage.getItem("companyName");
+    if (savedCompanyName) {
+      setCompanyName(savedCompanyName);
+    }
+  }, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -25,9 +32,12 @@ export default function Login({ navigate }) {
       localStorage.setItem("screens", JSON.stringify(res.data.screens || []));
       localStorage.setItem("permissions", JSON.stringify(res.data.permissions || {}));
       localStorage.setItem("userRole", res.data.role);
+      localStorage.setItem("companyName", companyName); // 🔹 حفظ اسم الشركة
 
       console.log("🔹 Saved screens:", res.data.screens);
       console.log("🔹 Saved role:", res.data.role);
+
+      if (onLogin) onLogin(res.data);
 
       if (res.data.role === "admin") {
         navigate("/admin-users");

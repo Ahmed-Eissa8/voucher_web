@@ -1,11 +1,10 @@
-import React, { useState, useRef } from "react";
-import axios from "axios";
+import React, { useState, useRef, useEffect } from "react";
+import api from "../../api";
 import html2pdf from "html2pdf.js";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Select from "react-select";
 import "./BalanceSheet.css";
-import logoImg from "./logo.jpg";
 import cairoFont from "./Cairo-Bold-normal.js";
 
 export default function AccountStatement({ lang }) {
@@ -13,6 +12,7 @@ export default function AccountStatement({ lang }) {
   const [dateRange, setDateRange] = useState([null, null]);
   const [startDate, endDate] = dateRange;
   const [data, setData] = useState([]);
+  const [companyDetails, setCompanyDetails] = useState(null);
   const [accountOptions, setAccountOptions] = useState([]);
   const [selectedAccount, setSelectedAccount] = useState(null);
   const [message, setMessage] = useState(null);
@@ -61,10 +61,22 @@ export default function AccountStatement({ lang }) {
     setTimeout(() => setMessage(null), 3000);
   };
 
+  useEffect(() => {
+    const fetchCompanyDetails = async () => {
+      try {
+        const res = await api.get("/company-details");
+        setCompanyDetails(res.data);
+      } catch (err) {
+        console.error("Failed to fetch company details", err);
+      }
+    };
+    fetchCompanyDetails();
+  }, []);
+
   const fetchAccounts = async (inputValue) => {
     if (!inputValue) return;
     try {
-      const res = await axios.get("http://100.70.131.12:5000/accounts1", {
+      const res = await api.get("/accounts1", {
         params: { search: inputValue },
       });
       const options = res.data.map((acc) => ({
@@ -85,7 +97,7 @@ export default function AccountStatement({ lang }) {
     }
 
     try {
-      const res = await axios.get("http://100.70.131.12:5000/account-statement", {
+      const res = await api.get("/account-statement", {
         params: {
           sub_no: subNo,
           fdate: startDate.toISOString().split("T")[0],
@@ -108,6 +120,13 @@ const handleSavePDF = () => {
     return;
   }
 
+  const headerContent = companyDetails
+    ? `<div style="text-align: ${lang === "ar" ? "right" : "left"};">
+         <div style="font-size: 22px; font-weight: bold;">${companyDetails.name}</div>
+         <div>${companyDetails.location}</div>
+       </div>`
+    : "";
+
   const element = document.createElement("div");
   const accountName = selectedAccount.label;
   const periodBalance = Number(data[0]?.period_balance ?? 0).toLocaleString();
@@ -118,10 +137,10 @@ const handleSavePDF = () => {
 
   element.innerHTML = `
     <div style="font-family: 'Cairo', Arial, sans-serif; padding: 20px; color: #153F4D; ${lang === "ar" ? "direction: rtl; text-align: right;" : ""}">
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
-  <img src="${logoImg}" alt="Logo" style="height:80px; width:auto;" />
-  <div style="font-size: 24px; font-weight: 700;">${t.title}</div>
-</div>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
+        ${headerContent}
+        <div style="font-size: 24px; font-weight: 700;">${t.title}</div>
+      </div>
 
       <p style="margin-top: 60px;"><strong>${t.account}:</strong> ${accountName}</p>
       <p><strong>${t.period}:</strong> ${periodText}</p>

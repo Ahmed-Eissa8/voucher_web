@@ -74,6 +74,7 @@ export default function VoucherForm({ lang, permissions }) {
   const [activeIndex, setActiveIndex] = useState(-1);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [message, setMessage] = useState(null);
+  const [companyDetails, setCompanyDetails] = useState(null);
 
   const showMessage = (text, type = "success") => {
     setMessage({ text, type });
@@ -96,7 +97,13 @@ export default function VoucherForm({ lang, permissions }) {
   // useEffect(() => resetForm(), []);
   useEffect(() => {
   const init = async () => {
-    await resetForm();
+    try {
+      await resetForm();
+      const res = await api.get("/company-details");
+      setCompanyDetails(res.data);
+    } catch (err) {
+      console.error("Failed to fetch company details", err);
+    }
   };
   init();
 }, []);
@@ -176,11 +183,20 @@ const printVoucher = () => {
     this.addFont("Cairo-Bold.ttf", "Cairo", "normal");
   }]);
 
+  const headerContent = companyDetails
+    ? `<div style="text-align: ${lang === "ar" ? "right" : "left"};">
+         <div style="font-size: 22px; font-weight: bold;">${companyDetails.name}</div>
+         <div>${companyDetails.location}</div>
+       </div>`
+    : "";
+
   const element = document.createElement("div");
   element.innerHTML = `
     <div style="font-family: 'Cairo', Arial, sans-serif; padding: 20px; ${lang === "ar" ? "direction: rtl; text-align: right;" : ""}">
-      <h2 style="text-align:center;">${labels[lang].title}</h2>
-      <p><strong>${labels[lang].voucherNo}:</strong> ${voucherNo}</p>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        ${headerContent}
+        <h2 style="text-align:center;">${labels[lang].title}</h2>
+      </div>      <p><strong>${labels[lang].voucherNo}:</strong> ${voucherNo}</p>
       <p><strong>${labels[lang].date}:</strong> ${date}</p>
       <table style="width:100%; border-collapse: collapse; margin-top: 20px; page-break-inside: auto;">
         <thead style="display: table-header-group;">

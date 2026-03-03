@@ -1,8 +1,13 @@
 // frontend/src/api.js
 import axios from "axios";
 
+const baseURL =
+  process.env.NODE_ENV === "development"
+    ? "http://localhost:4400/api" // عنوان الخادم المحلي
+    : "https://acc.kian24.com/api"; // عنوان الخادم الإنتاجي
+
 const api = axios.create({
-  baseURL: "http://localhost:5000/api", // أضفنا /api هنا
+  baseURL,
 });
 
 // 🔹 إضافة التوكن تلقائياً لكل الطلبات

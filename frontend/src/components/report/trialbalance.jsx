@@ -1,10 +1,9 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import html2pdf from "html2pdf.js";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Select from "react-select";
 import "./BalanceSheet.css";
-import logoImg from "./logo.jpg";
 import cairoFont from "./Cairo-Bold-normal.js";
 import api from "../../api";
 
@@ -13,6 +12,7 @@ export default function TrialBalance({ lang }) {
   const [dateRange, setDateRange] = useState([null, null]);
   const [startDate, endDate] = dateRange;
   const [data, setData] = useState([]);
+  const [companyDetails, setCompanyDetails] = useState(null);
   const [message, setMessage] = useState(null);
   const reportRef = useRef();
 
@@ -58,6 +58,18 @@ export default function TrialBalance({ lang }) {
     setTimeout(() => setMessage(null), 3000);
   };
 
+  useEffect(() => {
+    const fetchCompanyDetails = async () => {
+      try {
+        const res = await api.get("/company-details");
+        setCompanyDetails(res.data);
+      } catch (err) {
+        console.error("Failed to fetch company details", err);
+      }
+    };
+    fetchCompanyDetails();
+  }, []);
+
   // جلب البيانات
   const fetchReport = async () => {
     if (!level || !startDate || !endDate) {
@@ -91,11 +103,18 @@ export default function TrialBalance({ lang }) {
       return;
     }
 
+    const headerContent = companyDetails
+      ? `<div style="text-align: ${lang === "ar" ? "right" : "left"};">
+           <div style="font-size: 22px; font-weight: bold;">${companyDetails.name}</div>
+           <div>${companyDetails.location}</div>
+         </div>`
+      : "";
+
     const element = document.createElement("div");
     element.innerHTML = `
       <div style="font-family:'Cairo', Arial; padding:25px; color:#153F4D; ${lang === "ar" ? "direction:rtl; text-align:right;" : ""}">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:40px;">
-          <img src="${logoImg}" alt="Logo" style="height:70px;" />
+          ${headerContent}
           <div style="font-size:24px; font-weight:700;">${t.title}</div>
         </div>
 

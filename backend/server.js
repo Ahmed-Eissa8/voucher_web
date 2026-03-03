@@ -3,6 +3,9 @@ import mysql from "mysql2/promise";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import cors from "cors";
+import dotenv from "dotenv";
+
+dotenv.config({ path: "db.env" });
 
 const usersRouter = express.Router();
 
@@ -11,15 +14,15 @@ app.use(cors());
 app.use(express.json());
 
 const pool = mysql.createPool({
-  host: "localhost",
-  user: "root",
-  password: "0000",
-  database: "accounting_web",
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
   waitForConnections: true,
   connectionLimit: 10,
 });
 
-const JWT_SECRET = "your_secret_key";
+const JWT_SECRET = process.env.JWT_SECRET;
 
 // ================== Middleware للتحقق ==================
 function authMiddleware() {
@@ -36,6 +39,7 @@ function authMiddleware() {
     }
   };
 }
+
 
 // requireCompanyAdmin.js
 export function requireCompanyAdmin() {
@@ -996,17 +1000,19 @@ usersRouter.put("/:id/permissions", async (req, res) => {
 
 app.get("/api/reports/balance-sheet", authMiddleware(), async (req, res) => {
   try {
+    const company_id = req.user.company_id;
     const [rows] = await pool.query(`
       SELECT 
         sb.subbname AS subband_name,
         SUM(IFNULL(j.JOURNAL_DR, 0) - IFNULL(j.JOURNAL_CR, 0)) AS total_balance
       FROM journal j
-      LEFT JOIN submain sm ON j.JOURNAL_SUBMAIN_NO = sm.SUBMAIN_NO
-      LEFT JOIN main m ON sm.SUBMAIN_MAIN_NO = m.MAIN_NO
-      LEFT JOIN subband sb ON m.MAIN_BAND_NO = sb.subbno
+      LEFT JOIN submain sm ON j.JOURNAL_SUBMAIN_NO = sm.SUBMAIN_NO AND sm.company_id = j.company_id
+      LEFT JOIN main m ON sm.SUBMAIN_MAIN_NO = m.MAIN_NO AND m.company_id = j.company_id
+      LEFT JOIN subband sb ON m.MAIN_BAND_NO = sb.subbno AND sb.company_id = j.company_id
+      WHERE j.company_id = ?
       GROUP BY sb.subbname
       ORDER BY sb.subbno;
-    `);
+    `, [company_id]);
 
     // هيكل البيانات النهائي
     const subbands = rows.map(r => ({
@@ -1022,9 +1028,10 @@ app.get("/api/reports/balance-sheet", authMiddleware(), async (req, res) => {
 });
 
 
-app.get('/account-statement', async (req, res) => {
+app.get('/api/account-statement', authMiddleware(), async (req, res) => {
   const { sub_no, fdate, ldate } = req.query;
-
+  const company_id = req.user.company_id;
+  
   try {
     const SYSYEAR = new Date().getFullYear();
 
@@ -1053,6 +1060,7 @@ app.get('/account-statement', async (req, res) => {
                       OR (j2.journal_date = j.journal_date AND j2.journal_no = j.journal_no AND j2.idauto <= j.idauto)
                   )
                   AND YEAR(j2.journal_date) = ?
+                  AND j2.company_id = ?
           ) AS running_balance,
 
           --  إجمالي رصيد السنة كلها (Final balance)
@@ -1063,6 +1071,7 @@ app.get('/account-statement', async (req, res) => {
               WHERE
                   j3.journal_submain_no = j.journal_submain_no
                   AND YEAR(j3.journal_date) = ?
+                  AND j3.company_id = ?
           ) AS final_balance,
 
           --  رصيد الفترة فقط (Period balance)
@@ -1073,24 +1082,28 @@ app.get('/account-statement', async (req, res) => {
               WHERE
                   j4.journal_submain_no = j.journal_submain_no
                   AND j4.journal_date BETWEEN ? AND ?
+                  AND j4.company_id = ?
           ) AS period_balance
 
       FROM journal j
-      INNER JOIN submain sm ON j.journal_submain_no = sm.submain_no
+      INNER JOIN submain sm ON j.journal_submain_no = sm.submain_no AND sm.company_id = ?
 
       WHERE
           j.journal_submain_no = ?
           AND YEAR(j.journal_date) = ?
           AND j.journal_date BETWEEN ? AND ?
+          AND j.company_id = ?
 
       ORDER BY
           j.journal_date,
           j.journal_no,
           j.idauto;
       `,
-      [SYSYEAR, SYSYEAR, fdate, ldate, sub_no, SYSYEAR, fdate, ldate]
+      [
+        SYSYEAR, company_id, SYSYEAR, company_id, fdate, ldate, company_id, 
+        company_id, sub_no, SYSYEAR, fdate, ldate, company_id
+      ]
     );
-
     res.json(result);
   } catch (error) {
     console.error(error);
@@ -1101,16 +1114,16 @@ app.get('/account-statement', async (req, res) => {
 
 
 // البحث عن الحسابات بالاسم
-app.get('/accounts1', async (req, res) => {
+app.get('/api/accounts1', authMiddleware(), async (req, res) => {
   const { search } = req.query;
-
+  const company_id = req.user.company_id;
   try {
     const [rows] = await pool.query(
       `SELECT submain_no AS sub_no, submain_name AS name 
        FROM submain 
-       WHERE submain_name LIKE ? 
+       WHERE submain_name LIKE ? AND company_id = ?
        LIMIT 20`,
-      [`%${search}%`]
+      [`%${search}%`, company_id]
     );
     res.json(rows);
   } catch (err) {
@@ -1119,9 +1132,27 @@ app.get('/accounts1', async (req, res) => {
   }
 });
 
-// تقرير ميزان المراجعة حسب المستوى
-app.get("/api/trial-balance", async (req, res) => {
+// جلب تفاصيل الشركة الحالية
+app.get("/api/company-details", authMiddleware(), async (req, res) => {
   try {
+    const [company] = await pool.query(
+      "SELECT name, location FROM company WHERE id = ?",
+      [req.user.company_id]
+    );
+    if (company.length === 0) {
+      return res.status(404).json({ error: "Company not found" });
+    }
+    res.json(company[0]);
+  } catch (err) {
+    console.error("Company Details Error:", err);
+    res.status(500).json({ error: "Failed to fetch company details" });
+  }
+});
+
+// تقرير ميزان المراجعة حسب المستوى
+app.get("/api/trial-balance", authMiddleware(), async (req, res) => {
+  try {
+    const company_id = req.user.company_id;
     const { level, fromDate, toDate } = req.query;
 
     let query = "";
@@ -1139,7 +1170,7 @@ app.get("/api/trial-balance", async (req, res) => {
           INNER JOIN MAIN M ON SM.SUBMAIN_MAIN_NO = M.MAIN_NO
           INNER JOIN SUBBAND SB ON M.MAIN_BAND_NO = SB.SUBBNO
           INNER JOIN BAND B ON SB.SUBB_BAND_NO = B.BAND_NO
-          WHERE J.JOURNAL_DATE BETWEEN ? AND ?
+          WHERE J.JOURNAL_DATE BETWEEN ? AND ? AND J.company_id = ?
           GROUP BY B.BAND_NO, B.BAND_NAME
           ORDER BY B.BAND_NO;
         `;
@@ -1156,7 +1187,7 @@ app.get("/api/trial-balance", async (req, res) => {
           INNER JOIN SUBMAIN SM ON J.JOURNAL_SUBMAIN_NO = SM.SUBMAIN_NO
           INNER JOIN MAIN M ON SM.SUBMAIN_MAIN_NO = M.MAIN_NO
           INNER JOIN SUBBAND SB ON M.MAIN_BAND_NO = SB.SUBBNO
-          WHERE J.JOURNAL_DATE BETWEEN ? AND ?
+          WHERE J.JOURNAL_DATE BETWEEN ? AND ? AND J.company_id = ?
           GROUP BY SB.SUBBNO, SB.SUBBNAME
           ORDER BY SB.SUBBNO;
         `;
@@ -1172,7 +1203,7 @@ app.get("/api/trial-balance", async (req, res) => {
           FROM JOURNAL J
           INNER JOIN SUBMAIN SM ON J.JOURNAL_SUBMAIN_NO = SM.SUBMAIN_NO
           INNER JOIN MAIN M ON SM.SUBMAIN_MAIN_NO = M.MAIN_NO
-          WHERE J.JOURNAL_DATE BETWEEN ? AND ?
+          WHERE J.JOURNAL_DATE BETWEEN ? AND ? AND J.company_id = ?
           GROUP BY M.MAIN_NO, M.MAIN_NAME
           ORDER BY M.MAIN_NO;
         `;
@@ -1187,7 +1218,7 @@ app.get("/api/trial-balance", async (req, res) => {
             SUM(IFNULL(J.JOURNAL_CR,0)) AS CREDIT
           FROM JOURNAL J
           INNER JOIN SUBMAIN SM ON J.JOURNAL_SUBMAIN_NO = SM.SUBMAIN_NO
-          WHERE J.JOURNAL_DATE BETWEEN ? AND ?
+          WHERE J.JOURNAL_DATE BETWEEN ? AND ? AND J.company_id = ?
           GROUP BY SM.SUBMAIN_NO, SM.SUBMAIN_NAME
           ORDER BY SM.SUBMAIN_NO;
         `;
@@ -1197,7 +1228,7 @@ app.get("/api/trial-balance", async (req, res) => {
         return res.status(400).json({ error: "Invalid level" });
     }
 
-    const [rows] = await pool.execute(query, [fromDate, toDate]);
+    const [rows] = await pool.execute(query, [fromDate, toDate, company_id]);
     res.json(rows);
   } catch (err) {
     console.error(err);
@@ -1210,4 +1241,5 @@ app.get("/api/trial-balance", async (req, res) => {
 
 
 // تشغيل السيرفر
-app.listen(5000, () => console.log("Server running on http://localhost:5000"));
+const PORT = process.env.PORT || 4400;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
