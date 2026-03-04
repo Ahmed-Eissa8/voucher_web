@@ -37,7 +37,13 @@ useEffect(() => {
 const navigate = (path) => {
   switch (path) {
     case "/login":
+      // نحفظ اسم الشركة قبل حذف كل شيء
+      const companyName = localStorage.getItem("companyName");
       localStorage.clear();
+      // نعيد اسم الشركة إلى التخزين المحلي إذا كان موجوداً
+      if (companyName) {
+        localStorage.setItem("companyName", companyName);
+      }
       setUser(null);
       setPage("login");
       break;

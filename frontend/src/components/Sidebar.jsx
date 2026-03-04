@@ -43,7 +43,11 @@ function Sidebar({ lang, setLang, navigate }) {
 
   const handleLogout = () => {
     alert(lang === "ar" ? "تم تسجيل الخروج" : "Logged out");
+    const companyName = localStorage.getItem("companyName");
     localStorage.clear();
+    if (companyName) {
+      localStorage.setItem("companyName", companyName);
+    }
     navigate("/login");
   };
 

@@ -40,6 +40,43 @@ function authMiddleware() {
   };
 }
 
+// Middleware for super admin (company_id = 1)
+function requireSuperAdmin() {
+  return (req, res, next) => {
+    if (!req.user || req.user.company_id !== 1) {
+      return res.status(403).json({ error: "Super admin access required" });
+    }
+    next();
+  };
+}
+
+// Middleware to check for specific screen/action permissions
+function requirePermission(screen, permission) {
+  return async (req, res, next) => {
+    // Admin role always has access
+    if (req.user.role === 'admin') {
+      return next();
+    }
+
+    try {
+      const [rows] = await pool.query("SELECT permissions FROM users WHERE id = ?", [req.user.id]);
+      if (!rows.length) {
+        return res.status(403).json({ error: "Permission denied. User not found." });
+      }
+      
+      const userPermissions = rows[0].permissions ? JSON.parse(rows[0].permissions) : {};
+      
+      if (userPermissions[screen] && userPermissions[screen][permission]) {
+        return next();
+      }
+
+      return res.status(403).json({ error: `Permission denied. Requires '${permission}' permission for '${screen}'.` });
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ error: "Server error while checking permissions." });
+    }
+  };
+}
 
 // requireCompanyAdmin.js
 export function requireCompanyAdmin() {
@@ -153,7 +190,7 @@ app.post("/api/login", async (req, res) => {
     // أولاً تحقق من الشركة
     const [companies] = await pool.query(
       "SELECT * FROM company WHERE name = ?",
-      [company_name]
+      [company_name.trim()]
     );
     if (companies.length === 0) {
       return res.status(400).json({ error: "الشركة غير موجودة" });
@@ -163,7 +200,7 @@ app.post("/api/login", async (req, res) => {
     // ثم تحقق من المستخدم داخل هذه الشركة
     const [users] = await pool.query(
       "SELECT * FROM users WHERE username = ? AND company_id = ?",
-      [username, company.id]
+      [username.trim(), company.id]
     );
     if (users.length === 0) return res.status(400).json({ error: "User not found" });
 
@@ -341,7 +378,7 @@ app.delete("/api/voucher/:id", authMiddleware(), async (req, res) => {
 });
 
 
-app.get("/api/accounts", async (req, res) => {
+app.get("/api/accounts", authMiddleware(), async (req, res) => {
   const { query, type } = req.query;
   if (!query) return res.json([]);
 
@@ -350,14 +387,14 @@ app.get("/api/accounts", async (req, res) => {
       type === "accNo"
         ? `SELECT SUBMAIN_NO, SUBMAIN_NAME 
            FROM submain 
-           WHERE SUBMAIN_NO LIKE ? OR SUBMAIN_NAME LIKE ? 
+           WHERE (SUBMAIN_NO LIKE ? OR SUBMAIN_NAME LIKE ?) AND company_id = ?
            LIMIT 20`
         : `SELECT SUBMAIN_NO, SUBMAIN_NAME 
            FROM submain 
-           WHERE SUBMAIN_NAME LIKE ? OR SUBMAIN_NO LIKE ? 
+           WHERE (SUBMAIN_NAME LIKE ? OR SUBMAIN_NO LIKE ?) AND company_id = ?
            LIMIT 20`;
 
-    const [rows] = await pool.query(sql, [`${query}%`, `${query}%`]);
+    const [rows] = await pool.query(sql, [`${query}%`, `${query}%`, req.user.company_id]);
     res.json(rows);
   } catch (err) {
     console.error(err);
@@ -422,7 +459,7 @@ app.get("/api/accounts/all", authMiddleware(), async (req, res) => {
     const [rows] = await pool.query(
       `SELECT s.SUBMAIN_NO, s.SUBMAIN_NAME, s.SUBMAIN_MAIN_NO, m.MAIN_NAME
        FROM submain s
-       LEFT JOIN main m ON s.SUBMAIN_MAIN_NO = m.MAIN_NO
+       LEFT JOIN main m ON s.SUBMAIN_MAIN_NO = m.MAIN_NO AND m.company_id = s.company_id
        WHERE (s.SUBMAIN_NO LIKE ? OR s.SUBMAIN_NAME LIKE ?)
        AND s.company_id = ?`,
       [`%${search}%`, `%${search}%`, req.user.company_id]
@@ -520,23 +557,6 @@ app.delete("/api/accounts/:id", authMiddleware(), async (req, res) => {
 
 
 // ==================== الحسابات العليا (subband) ====================
-
-// جلب الحسابات العليا
-app.get("/api/high-accounts", authMiddleware(), async (req, res) => {
-  try {
-    const [rows] = await pool.query(
-      `SELECT ID, subbno, subbname, subb_band_no 
-       FROM subband 
-       WHERE company_id = ? 
-       ORDER BY subbno ASC`,
-      [req.user.company_id]
-    );
-    res.json(rows);
-  } catch (err) {
-    console.error("High Accounts Error:", err);
-    res.status(500).json({ error: err.message });
-  }
-});
 
 // ==================== الحسابات الفرعية (main) ====================
 
@@ -655,7 +675,7 @@ app.delete("/api/sub-accounts/:mainNo", authMiddleware(), async (req, res) => {
 // ==================== الحسابات العليا (subband) ====================
 
 // جلب الحسابات العليا للمستخدم الحالي وشركته فقط
-app.get("/api/bands", async (req, res) => {
+app.get("/api/bands", authMiddleware(), async (req, res) => {
   try {
     const [rows] = await pool.query("SELECT BAND_NO, BAND_NAME FROM band ORDER BY BAND_NO ASC");
     res.json(rows);
@@ -672,14 +692,13 @@ app.get("/api/high-accounts", authMiddleware(), async (req, res) => {
       SELECT s.ID, s.subbno, s.subbname, s.subb_band_no, b.BAND_NAME as band_name
       FROM subband s
       LEFT JOIN band b ON s.subb_band_no = b.BAND_NO
-      WHERE s.company_id = ? AND s.user_id = ?
+      WHERE s.company_id = ?
         AND (s.subbno LIKE ? OR s.subbname LIKE ? OR b.BAND_NAME LIKE ?)
       ORDER BY s.subbno ASC
       LIMIT 50
     `;
     const [rows] = await pool.query(sql, [
       req.user.company_id,
-      req.user.id,
       `%${search}%`,
       `%${search}%`,
       `%${search}%`
@@ -698,8 +717,8 @@ app.post("/api/high-accounts", authMiddleware(), async (req, res) => {
 
   try {
     const [exist] = await pool.query(
-      "SELECT * FROM subband WHERE subbno = ? AND company_id = ? AND user_id = ?",
-      [subbno, req.user.company_id, req.user.id]
+      "SELECT * FROM subband WHERE subbno = ? AND company_id = ?",
+      [subbno, req.user.company_id]
     );
     if (exist.length > 0)
       return res.status(400).json({ error: "Subband already exists" });
@@ -726,8 +745,8 @@ app.put("/api/high-accounts/:id", authMiddleware(), async (req, res) => {
   try {
     // تأكد من ملكية الحساب
     const [current] = await pool.query(
-      "SELECT * FROM subband WHERE ID = ? AND company_id = ? AND user_id = ?",
-      [id, req.user.company_id, req.user.id]
+      "SELECT * FROM subband WHERE ID = ? AND company_id = ?",
+      [id, req.user.company_id]
     );
     if (current.length === 0)
       return res.status(404).json({ error: "Subband not found" });
@@ -735,16 +754,16 @@ app.put("/api/high-accounts/:id", authMiddleware(), async (req, res) => {
     // تحقق من التكرار إذا تم تغيير الرقم
     if (current[0].subbno !== subbno) {
       const [exist] = await pool.query(
-        "SELECT * FROM subband WHERE subbno = ? AND company_id = ? AND user_id = ?",
-        [subbno, req.user.company_id, req.user.id]
+        "SELECT * FROM subband WHERE subbno = ? AND company_id = ?",
+        [subbno, req.user.company_id]
       );
       if (exist.length > 0)
         return res.status(400).json({ error: "Subband No already exists" });
     }
 
     await pool.query(
-      "UPDATE subband SET subbno = ?, subbname = ?, subb_band_no = ? WHERE ID = ? AND company_id = ? AND user_id = ?",
-      [subbno, subbname, subb_band_no, id, req.user.company_id, req.user.id]
+      "UPDATE subband SET subbno = ?, subbname = ?, subb_band_no = ? WHERE ID = ? AND company_id = ?",
+      [subbno, subbname, subb_band_no, id, req.user.company_id]
     );
 
     res.json({ message: "Subband updated successfully" });
@@ -758,8 +777,8 @@ app.delete("/api/high-accounts/:id", authMiddleware(), async (req, res) => {
   const { id } = req.params;
   try {
     const [result] = await pool.query(
-      "DELETE FROM subband WHERE ID = ? AND company_id = ? AND user_id = ?",
-      [id, req.user.company_id, req.user.id]
+      "DELETE FROM subband WHERE ID = ? AND company_id = ?",
+      [id, req.user.company_id]
     );
 
     if (result.affectedRows === 0)
@@ -771,12 +790,82 @@ app.delete("/api/high-accounts/:id", authMiddleware(), async (req, res) => {
   }
 });
 
+// ==================== Companies Router (Super Admin) ====================
+const companiesRouter = express.Router();
 
+// GET all companies
+companiesRouter.get("/", authMiddleware(), requireSuperAdmin(), async (req, res) => {
+  try {
+    const [rows] = await pool.query("SELECT id, name, location, tel, email, taxid FROM company ORDER BY name ASC");
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch companies" });
+  }
+});
+
+// POST a new company
+companiesRouter.post("/", authMiddleware(), requireSuperAdmin(), async (req, res) => {
+  const { name, location, tel, email, taxid } = req.body;
+  if (!name) return res.status(400).json({ error: "Company name is required" });
+  try {
+    const [result] = await pool.query(
+      "INSERT INTO company (name, location, tel, email, taxid) VALUES (?, ?, ?, ?, ?)",
+      [name, location, tel, email, taxid]
+    );
+    res.json({ message: "Company created", id: result.insertId });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to create company" });
+  }
+});
+
+// PUT update a company
+companiesRouter.put("/:id", authMiddleware(), requireSuperAdmin(), async (req, res) => {
+  const { id } = req.params;
+  const { name, location, tel, email, taxid } = req.body;
+  try {
+    const [result] = await pool.query(
+      "UPDATE company SET name = ?, location = ?, tel = ?, email = ?, taxid = ? WHERE id = ?",
+      [name, location, tel, email, taxid, id]
+    );
+    if (result.affectedRows === 0) return res.status(404).json({ error: "Company not found" });
+    res.json({ message: "Company updated" });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to update company" });
+  }
+});
+
+// DELETE a company
+companiesRouter.delete("/:id", authMiddleware(), requireSuperAdmin(), async (req, res) => {
+  const { id } = req.params;
+  if (parseInt(id, 10) === 1) {
+    return res.status(400).json({ error: "Cannot delete the main company" });
+  }
+  try {
+    await pool.query("DELETE FROM users WHERE company_id = ?", [id]);
+    const [result] = await pool.query("DELETE FROM company WHERE id = ?", [id]);
+    if (result.affectedRows === 0) return res.status(404).json({ error: "Company not found" });
+    res.json({ message: "Company and its users deleted" });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to delete company" });
+  }
+});
+
+app.use("/api/companies", companiesRouter);
+
+
+// GET /api/users?company_id=X
 usersRouter.get("/", authMiddleware(), async (req, res) => {
   try {
+    const companyIdToFetch = req.query.company_id || req.user.company_id;
+
+    // Security: Only super admin can fetch users from other companies
+    if (parseInt(companyIdToFetch, 10) !== req.user.company_id && req.user.company_id !== 1) {
+      return res.status(403).json({ error: "Access denied to this company's users." });
+    }
+
     const [rows] = await pool.query(
-      "SELECT id, username, role, company_id, permissions FROM users WHERE company_id = ?",
-      [req.user.company_id]
+      "SELECT id, username, role, company_id FROM users WHERE company_id = ?",
+      [companyIdToFetch]
     );
     res.json(rows);
   } catch (err) {
@@ -787,30 +876,37 @@ usersRouter.get("/", authMiddleware(), async (req, res) => {
 
 
 
-usersRouter.post("/", authMiddleware(), async (req, res) => {
-  const { username, password, role = "user", permissions = { view: true, edit: false } } = req.body;
+usersRouter.post("/", authMiddleware(), requirePermission('Users', 'edit'), async (req, res) => {
+  const { username, password, role = "user", company_id } = req.body;
   if (!username || !password) return res.status(400).json({ error: "username and password required" });
+
+  const companyIdToAddTo = company_id || req.user.company_id;
+
+  if (req.user.company_id !== 1 && parseInt(companyIdToAddTo, 10) !== req.user.company_id) {
+    return res.status(403).json({ error: "Permission denied." });
+  }
 
   try {
     const [existing] = await pool.query(
       "SELECT * FROM users WHERE username = ? AND company_id = ?",
-      [username, req.user.company_id]
+      [username, companyIdToAddTo]
     );
     if (existing.length > 0) return res.status(400).json({ error: "User already exists in this company" });
 
     const hashed = await bcrypt.hash(password, 10);
     const [result] = await pool.query(
-      "INSERT INTO users (username, password, role, company_id, permissions) VALUES (?, ?, ?, ?, ?)",
-      [username, hashed, role, req.user.company_id, JSON.stringify(permissions)]
+      "INSERT INTO users (username, password, role, company_id) VALUES (?, ?, ?, ?)",
+      [username, hashed, role, companyIdToAddTo]
     );
 
     res.json({
-  id: result.insertId,
-  username,
-  role,
-  screens: [],
-  permissions: {},
-});
+      id: result.insertId,
+      username,
+      role,
+      company_id: parseInt(companyIdToAddTo, 10),
+      screens: [],
+      permissions: {},
+    });
 
   } catch (err) {
     console.error(err);
@@ -818,60 +914,35 @@ usersRouter.post("/", authMiddleware(), async (req, res) => {
   }
 });
 
-
-
-// PUT /api/users/:id -> Admin يعدل دور/صلاحيات/اسم المستخدم (لكن فقط لمستخدمي نفس الشركة)
-// usersRouter.put("/:id", authMiddleware(), requireCompanyAdmin(), async (req, res) => {
-//   const { id } = req.params;
-//   const { username, role, permissions } = req.body;
-
-//   try {
-//     // تأكد أن المستخدم الذي سيتم تعديله تابع لنفس الشركة
-//     const [target] = await pool.query("SELECT * FROM users WHERE id = ? AND company_id = ?", [id, req.user.company_id]);
-//     if (target.length === 0) return res.status(404).json({ error: "User not found in your company" });
-
-//     // منع تعديل نفسك لتفادي حذف admin الرئيسي (اختياري)
-//     // if (req.user.id === Number(id)) return res.status(400).json({ error: "Cannot change own role" });
-
-//     const updates = [];
-//     const params = [];
-
-//     if (username) { updates.push("username = ?"); params.push(username); }
-//     if (role) { updates.push("role = ?"); params.push(role); }
-//     if (permissions) { updates.push("permissions = ?"); params.push(JSON.stringify(permissions)); }
-
-//     if (updates.length === 0) return res.status(400).json({ error: "No fields to update" });
-
-//     params.push(id, req.user.company_id);
-//     const sql = `UPDATE users SET ${updates.join(", ")} WHERE id = ? AND company_id = ?`;
-//     const [result] = await pool.query(sql, params);
-
-//     res.json({ message: "User updated" });
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({ error: err.message });
-//   }
-// });
-
-usersRouter.put("/:id", authMiddleware(), async (req, res) => {
+usersRouter.put("/:id", authMiddleware(), requirePermission('Users', 'edit'), async (req, res) => {
   const { id } = req.params;
-  const { username, role, permissions } = req.body;
+  const { username, password } = req.body;
 
   try {
-    const [target] = await pool.query("SELECT * FROM users WHERE id = ? AND company_id = ?", [id, req.user.company_id]);
-    if (target.length === 0) return res.status(404).json({ error: "User not found in your company" });
+    // Security check
+    const [targetUser] = await pool.query("SELECT company_id FROM users WHERE id = ?", [id]);
+    if (!targetUser.length) return res.status(404).json({ error: "User not found" });
+    if (targetUser[0].company_id !== req.user.company_id && req.user.company_id !== 1) {
+      return res.status(403).json({ error: "Permission denied." });
+    }
 
     const updates = [];
     const params = [];
 
-    if (username) { updates.push("username = ?"); params.push(username); }
-    if (role) { updates.push("role = ?"); params.push(role); }
-    if (permissions) { updates.push("permissions = ?"); params.push(JSON.stringify(permissions)); }
+    if (username) {
+      updates.push("username = ?");
+      params.push(username);
+    }
+    if (password) {
+      const hashed = await bcrypt.hash(password, 10);
+      updates.push("password = ?");
+      params.push(hashed);
+    }
 
     if (updates.length === 0) return res.status(400).json({ error: "No fields to update" });
 
-    params.push(id, req.user.company_id);
-    const sql = `UPDATE users SET ${updates.join(", ")} WHERE id = ? AND company_id = ?`;
+    params.push(id);
+    const sql = `UPDATE users SET ${updates.join(", ")} WHERE id = ?`;
     await pool.query(sql, params);
 
     res.json({ message: "User updated" });
@@ -881,13 +952,26 @@ usersRouter.put("/:id", authMiddleware(), async (req, res) => {
   }
 });
 
-
 // DELETE /api/users/:id -> Admin يحذف مستخدم داخل نفس الشركة
-usersRouter.delete("/:id", authMiddleware(), async (req, res) => {
+usersRouter.delete("/:id", authMiddleware(), requirePermission('Users', 'delete'), async (req, res) => {
   const { id } = req.params;
   try {
-    const [result] = await pool.query("DELETE FROM users WHERE id = ? AND company_id = ?", [id, req.user.company_id]);
-    if (result.affectedRows === 0) return res.status(404).json({ error: "User not found" });
+    // Super admin can delete any user
+    if (req.user.company_id === 1) {
+      const [result] = await pool.query("DELETE FROM users WHERE id = ?", [id]);
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ error: "User not found" });
+      }
+    } else {
+      // Regular admin can only delete users from their own company
+      const [result] = await pool.query(
+        "DELETE FROM users WHERE id = ? AND company_id = ?",
+        [id, req.user.company_id]
+      );
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ error: "User not found or permission denied" });
+      }
+    }
     res.json({ message: "User deleted" });
   } catch (err) {
     console.error(err);
@@ -900,67 +984,20 @@ usersRouter.delete("/:id", authMiddleware(), async (req, res) => {
 app.use("/api/users", usersRouter);
 
 
-// 🔐 جلب كل المستخدمين (لأدمن فقط)
-// app.get("/api/users", async (req, res) => {
-//   try {
-//     const [rows] = await pool.query(
-//       "SELECT id, name, email, role, can_add, can_edit, can_delete FROM users"
-//     );
-//     res.json(rows);
-//   } catch (err) {
-//     console.error("Fetch Users Error:", err);
-//     res.status(500).json({ message: "Error fetching users" });
-//   }
-// });
-
-// ✏️ تعديل صلاحيات مستخدم
-// app.put("/api/users/:id", async (req, res) => {
-//   const { id } = req.params;
-//   const { role, can_add, can_edit, can_delete } = req.body;
-
-//   try {
-//     await pool.query(
-//       "UPDATE users SET role=?, can_add=?, can_edit=?, can_delete=? WHERE id=?",
-//       [role, can_add, can_edit, can_delete, id]
-//     );
-//     res.json({ message: "User updated successfully" });
-//   } catch (err) {
-//     console.error("Update User Error:", err);
-//     res.status(500).json({ message: "Error updating user" });
-//   }
-// });
-
-// 🗑️ حذف مستخدم
-// app.delete("/api/users/:id", async (req, res) => {
-//   const { id } = req.params;
-//   try {
-//     await pool.query("DELETE FROM users WHERE id=?", [id]);
-//     res.json({ message: "User deleted successfully" });
-//   } catch (err) {
-//     console.error("Delete User Error:", err);
-//     res.status(500).json({ message: "Error deleting user" });
-//   }
-// });
-
-usersRouter.delete("/:id", async (req, res) => {
-  try {
-    const [result] = await db.query("DELETE FROM users WHERE id = ?", [req.params.id]);
-    if (result.affectedRows === 0) return res.status(404).json({ message: "User not found" });
-    res.json({ message: "User deleted" });
-  } catch (err) {
-    res.status(500).json({ message: "Error deleting user" });
-  }
-});
-
 
 
 // ✅ GET صلاحيات المستخدم
-usersRouter.get("/:id/permissions", async (req, res) => {
+usersRouter.get("/:id/permissions", authMiddleware(), requirePermission('Users', 'edit'), async (req, res) => {
   try {
     const { id } = req.params;
-    const [rows] = await pool.query("SELECT permissions, screens FROM users WHERE id = ?", [id]);
+    const [rows] = await pool.query("SELECT company_id, permissions, screens FROM users WHERE id = ?", [id]);
 
     if (!rows.length) return res.status(404).json({ error: "User not found" });
+
+    // Security: Only super admin can get perms for users from other companies
+    if (rows[0].company_id !== req.user.company_id && req.user.company_id !== 1) {
+      return res.status(403).json({ error: "Permission denied." });
+    }
 
     const user = rows[0];
     res.json({
@@ -974,10 +1011,19 @@ usersRouter.get("/:id/permissions", async (req, res) => {
 });
 
 // ✅ PUT لتحديث صلاحيات المستخدم
-usersRouter.put("/:id/permissions", async (req, res) => {
+usersRouter.put("/:id/permissions", authMiddleware(), requirePermission('Users', 'edit'), async (req, res) => {
   try {
     const { id } = req.params;
     const { permissions, screens } = req.body;
+
+    // Security: Check if admin has rights to edit this user
+    const [targetUser] = await pool.query("SELECT company_id FROM users WHERE id = ?", [id]);
+    if (!targetUser.length) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    if (targetUser[0].company_id !== req.user.company_id && req.user.company_id !== 1) {
+      return res.status(403).json({ error: "Permission denied." });
+    }
 
     const permissionsStr = JSON.stringify(permissions || {});
     const screensStr = JSON.stringify(screens || []);
@@ -1166,10 +1212,10 @@ app.get("/api/trial-balance", authMiddleware(), async (req, res) => {
             SUM(IFNULL(J.JOURNAL_DR,0)) AS DEBIT,
             SUM(IFNULL(J.JOURNAL_CR,0)) AS CREDIT
           FROM JOURNAL J
-          INNER JOIN SUBMAIN SM ON J.JOURNAL_SUBMAIN_NO = SM.SUBMAIN_NO
-          INNER JOIN MAIN M ON SM.SUBMAIN_MAIN_NO = M.MAIN_NO
-          INNER JOIN SUBBAND SB ON M.MAIN_BAND_NO = SB.SUBBNO
-          INNER JOIN BAND B ON SB.SUBB_BAND_NO = B.BAND_NO
+          INNER JOIN SUBMAIN SM ON J.JOURNAL_SUBMAIN_NO = SM.SUBMAIN_NO AND SM.company_id = J.company_id
+          INNER JOIN MAIN M ON SM.SUBMAIN_MAIN_NO = M.MAIN_NO AND M.company_id = J.company_id
+          INNER JOIN SUBBAND SB ON M.MAIN_BAND_NO = SB.SUBBNO AND SB.company_id = J.company_id
+          INNER JOIN BAND B ON SB.SUBB_BAND_NO = B.BAND_NO 
           WHERE J.JOURNAL_DATE BETWEEN ? AND ? AND J.company_id = ?
           GROUP BY B.BAND_NO, B.BAND_NAME
           ORDER BY B.BAND_NO;
@@ -1184,9 +1230,9 @@ app.get("/api/trial-balance", authMiddleware(), async (req, res) => {
             SUM(IFNULL(J.JOURNAL_DR,0)) AS DEBIT,
             SUM(IFNULL(J.JOURNAL_CR,0)) AS CREDIT
           FROM JOURNAL J
-          INNER JOIN SUBMAIN SM ON J.JOURNAL_SUBMAIN_NO = SM.SUBMAIN_NO
-          INNER JOIN MAIN M ON SM.SUBMAIN_MAIN_NO = M.MAIN_NO
-          INNER JOIN SUBBAND SB ON M.MAIN_BAND_NO = SB.SUBBNO
+          INNER JOIN SUBMAIN SM ON J.JOURNAL_SUBMAIN_NO = SM.SUBMAIN_NO AND SM.company_id = J.company_id
+          INNER JOIN MAIN M ON SM.SUBMAIN_MAIN_NO = M.MAIN_NO AND M.company_id = J.company_id
+          INNER JOIN SUBBAND SB ON M.MAIN_BAND_NO = SB.SUBBNO AND SB.company_id = J.company_id
           WHERE J.JOURNAL_DATE BETWEEN ? AND ? AND J.company_id = ?
           GROUP BY SB.SUBBNO, SB.SUBBNAME
           ORDER BY SB.SUBBNO;
@@ -1201,8 +1247,8 @@ app.get("/api/trial-balance", authMiddleware(), async (req, res) => {
             SUM(IFNULL(J.JOURNAL_DR,0)) AS DEBIT,
             SUM(IFNULL(J.JOURNAL_CR,0)) AS CREDIT
           FROM JOURNAL J
-          INNER JOIN SUBMAIN SM ON J.JOURNAL_SUBMAIN_NO = SM.SUBMAIN_NO
-          INNER JOIN MAIN M ON SM.SUBMAIN_MAIN_NO = M.MAIN_NO
+          INNER JOIN SUBMAIN SM ON J.JOURNAL_SUBMAIN_NO = SM.SUBMAIN_NO AND SM.company_id = J.company_id
+          INNER JOIN MAIN M ON SM.SUBMAIN_MAIN_NO = M.MAIN_NO AND M.company_id = J.company_id
           WHERE J.JOURNAL_DATE BETWEEN ? AND ? AND J.company_id = ?
           GROUP BY M.MAIN_NO, M.MAIN_NAME
           ORDER BY M.MAIN_NO;
@@ -1217,7 +1263,7 @@ app.get("/api/trial-balance", authMiddleware(), async (req, res) => {
             SUM(IFNULL(J.JOURNAL_DR,0)) AS DEBIT,
             SUM(IFNULL(J.JOURNAL_CR,0)) AS CREDIT
           FROM JOURNAL J
-          INNER JOIN SUBMAIN SM ON J.JOURNAL_SUBMAIN_NO = SM.SUBMAIN_NO
+          INNER JOIN SUBMAIN SM ON J.JOURNAL_SUBMAIN_NO = SM.SUBMAIN_NO AND SM.company_id = J.company_id
           WHERE J.JOURNAL_DATE BETWEEN ? AND ? AND J.company_id = ?
           GROUP BY SM.SUBMAIN_NO, SM.SUBMAIN_NAME
           ORDER BY SM.SUBMAIN_NO;
