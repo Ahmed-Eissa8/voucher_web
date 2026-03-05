@@ -380,21 +380,33 @@ app.delete("/api/voucher/:id", authMiddleware(), async (req, res) => {
 
 app.get("/api/accounts", authMiddleware(), async (req, res) => {
   const { query, type } = req.query;
-  if (!query) return res.json([]);
 
   try {
-    const sql =
-      type === "accNo"
-        ? `SELECT SUBMAIN_NO, SUBMAIN_NAME 
+    let sql;
+    let params;
+
+    if (!query && type === "accName") {
+      // جلب كل الحسابات عند التركيز على حقل اسم الحساب
+      sql = `SELECT SUBMAIN_NO, SUBMAIN_NAME FROM submain WHERE company_id = ? ORDER BY SUBMAIN_NO LIMIT 100`;
+      params = [req.user.company_id];
+    } else if (!query) {
+      return res.json([]);
+    } else if (type === "accNo") {
+      sql = `SELECT SUBMAIN_NO, SUBMAIN_NAME 
            FROM submain 
            WHERE (SUBMAIN_NO LIKE ? OR SUBMAIN_NAME LIKE ?) AND company_id = ?
-           LIMIT 20`
-        : `SELECT SUBMAIN_NO, SUBMAIN_NAME 
+           LIMIT 20`;
+      params = [`${query}%`, `${query}%`, req.user.company_id];
+    } else {
+      // البحث في اسم الحساب
+      sql = `SELECT SUBMAIN_NO, SUBMAIN_NAME 
            FROM submain 
            WHERE (SUBMAIN_NAME LIKE ? OR SUBMAIN_NO LIKE ?) AND company_id = ?
            LIMIT 20`;
+      params = [`%${query}%`, `%${query}%`, req.user.company_id];
+    }
 
-    const [rows] = await pool.query(sql, [`${query}%`, `${query}%`, req.user.company_id]);
+    const [rows] = await pool.query(sql, params);
     res.json(rows);
   } catch (err) {
     console.error(err);

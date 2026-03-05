@@ -54,6 +54,7 @@ h2 {
   border-collapse: collapse;
   margin-top: 20px;
   margin-bottom: 15px;
+  position: relative;
 }
 
 .voucher-table th,
@@ -74,6 +75,15 @@ h2 {
   background: #f0f6f6;
 }
 
+.voucher-table tbody {
+  overflow: visible;
+}
+
+.voucher-table tbody tr {
+  position: relative;
+  overflow: visible;
+}
+
 .voucher-table input {
   width: 100%;
   padding: 4px;
@@ -86,6 +96,7 @@ h2 {
 /* الاقتراحات */
 .with-suggestions {
   position: relative;
+  overflow: visible;
 }
 
 .suggestions {
@@ -95,17 +106,22 @@ h2 {
   left: 0;
   border: 1px solid #C8E2E1;
   background: #fff;
-  max-height: 150px;
+  max-height: 600px;
   overflow-y: auto;
-  z-index: 10;
+  z-index: 1000;
   list-style: none;
   margin: 0;
   padding: 0;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
 }
 
 .suggestions li {
-  padding: 5px;
+  padding: 8px 5px;
   cursor: pointer;
+  line-height: 1.5;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
 }
 
 .suggestions li.active,

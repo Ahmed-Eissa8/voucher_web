@@ -75,10 +75,22 @@ export default function VoucherForm({ lang, permissions }) {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [message, setMessage] = useState(null);
   const [companyDetails, setCompanyDetails] = useState(null);
+  const [suggestionFocus, setSuggestionFocus] = useState({ row: -1, input: null });
+
+  const addNewRow = () => {
+    setEntries(prev => [...prev, { ...emptyEntry }]);
+  };
 
   const showMessage = (text, type = "success") => {
     setMessage({ text, type });
     setTimeout(() => setMessage(null), 3000);
+  };
+
+  const handleInputBlur = () => {
+    // Delay hiding suggestions to allow click events on suggestions to fire
+    setTimeout(() => {
+      setShowSuggestions(false);
+    }, 200);
   };
 
   const resetForm = async () => {
@@ -143,11 +155,6 @@ const fetchAccounts = async (query, type = "accNo") => {
         newEntries[idx].accName = acc.SUBMAIN_NAME;
         setEntries(newEntries);
         setShowSuggestions(false);
-      } else {
-        const last = entries[entries.length - 1];
-        if (last.accNo || last.accName || last.reference || Number(last.dr) > 0 || Number(last.cr) > 0 || (last.desc && last.desc.trim() !== "")) {
-          setEntries([...entries, { ...emptyEntry }]);
-        }
       }
     } else if (e.key === "ArrowDown") {
       if (accounts.length) setActiveIndex((prev) => (prev + 1) % accounts.length);
@@ -471,9 +478,11 @@ const saveVoucher = async () => {
           value={row.accNo}
           disabled={!canEdit} // 🚫 تعطيل لو ما عنده صلاحية تعديل
           onChange={(e) => { handleChange(i, "accNo", e.target.value); fetchAccounts(e.target.value, "accNo"); }}
+          onFocus={() => setSuggestionFocus({ row: i, input: 'accNo' })}
+          onBlur={handleInputBlur}
           onKeyDown={(e) => handleKeyDown(e, i)}
         />
-        {showSuggestions && accounts.length > 0 && canEdit && (
+        {showSuggestions && suggestionFocus.row === i && suggestionFocus.input === 'accNo' && accounts.length > 0 && canEdit && (
           <ul className="suggestions">
             {accounts.map((acc, idx) => (
               <li key={idx} className={idx === activeIndex ? "active" : ""} onMouseDown={() => selectSuggestion(i, acc)}>
@@ -488,6 +497,8 @@ const saveVoucher = async () => {
           value={row.accName}
           disabled={!canEdit}
           onChange={(e) => { handleChange(i, "accName", e.target.value); fetchAccounts(e.target.value, "accName"); }}
+          onFocus={() => setSuggestionFocus({ row: i, input: 'accName' })}
+          onBlur={handleInputBlur}
         />
       </td>
       <td>
@@ -525,6 +536,28 @@ const saveVoucher = async () => {
 </tbody>
 
       </table>
+
+      {canEdit && (
+        <div style={{ marginTop: '10px' }}>
+          <button 
+            onClick={addNewRow} 
+            className="btn save" 
+            title={lang === 'ar' ? 'إضافة طرف جديد' : 'Add new entry'}
+            style={{ 
+              width: '40px', 
+              height: '40px', 
+              borderRadius: '50%', 
+              padding: 0, 
+              fontSize: '24px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            +
+          </button>
+        </div>
+      )}
 
       <div className="totals">
         <span>{labels[lang].totalDr}: {totalDr}</span>
