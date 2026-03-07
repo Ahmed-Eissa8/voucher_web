@@ -2,7 +2,7 @@
   position: fixed;
   top: 0;
   bottom: 0;
-  width: 250px;
+  width: 220px;
   background-color: #153f4d;
   color: #fff;
   transition: all 0.3s ease;
@@ -11,7 +11,7 @@
 }
 
 .sidebar.collapsed {
-  width: 70px;
+  width: 60px;
 }
 
 .sidebar.rtl {
@@ -93,4 +93,58 @@
 
 .submenu.active .submenu-header {
   background-color: #196272;
+}
+
+/* Overlay for mobile */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  display: none;
+}
+
+/* 📱 تحسينات الموبايل */
+@media (max-width: 768px) {
+  .sidebar-overlay {
+    display: block;
+  }
+  .sidebar.collapsed {
+    width: 0 !important;
+    overflow: visible; /* للسماح بظهور الزر العائم */
+  }
+
+  .sidebar.open {
+    width: 220px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5); /* ظل لإبراز القائمة فوق المحتوى */
+  }
+
+  .sidebar.open .toggle-btn {
+    display: none;
+  }
+
+  /* جعل زر القائمة عائماً وثابتاً في الأعلى */
+  .toggle-btn {
+    position: fixed;
+    top: 10px;
+    width: 25px;
+    height: 25px;
+    z-index: 1100;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  }
+
+  .sidebar.rtl .toggle-btn {
+    right: 10px;
+  }
+
+  .sidebar.ltr .toggle-btn {
+    left: 10px;
+  }
 }

@@ -77,12 +77,20 @@ export default function TrialBalance({ lang }) {
       return;
     }
 
+    // دالة لتنسيق التاريخ بالتوقيت المحلي لتجنب مشاكل UTC
+    const formatDate = (d) => {
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    };
+
     try {
       const res = await api.get("/trial-balance", {
         params: {
           level: level.value,
-          fromDate: startDate.toISOString().split("T")[0],
-          toDate: endDate.toISOString().split("T")[0],
+          fromDate: formatDate(startDate),
+          toDate: formatDate(endDate),
         },
       });
       setData(res.data);

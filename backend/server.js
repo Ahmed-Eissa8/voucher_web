@@ -1068,7 +1068,7 @@ app.get("/api/reports/balance-sheet", authMiddleware(), async (req, res) => {
       LEFT JOIN main m ON sm.SUBMAIN_MAIN_NO = m.MAIN_NO AND m.company_id = j.company_id
       LEFT JOIN subband sb ON m.MAIN_BAND_NO = sb.subbno AND sb.company_id = j.company_id
       WHERE j.company_id = ?
-      GROUP BY sb.subbname
+      GROUP BY sb.subbno, sb.subbname
       ORDER BY sb.subbno;
     `, [company_id]);
 
@@ -1223,11 +1223,11 @@ app.get("/api/trial-balance", authMiddleware(), async (req, res) => {
             B.BAND_NAME AS ACCNAME,
             SUM(IFNULL(J.JOURNAL_DR,0)) AS DEBIT,
             SUM(IFNULL(J.JOURNAL_CR,0)) AS CREDIT
-          FROM JOURNAL J
-          INNER JOIN SUBMAIN SM ON J.JOURNAL_SUBMAIN_NO = SM.SUBMAIN_NO AND SM.company_id = J.company_id
-          INNER JOIN MAIN M ON SM.SUBMAIN_MAIN_NO = M.MAIN_NO AND M.company_id = J.company_id
-          INNER JOIN SUBBAND SB ON M.MAIN_BAND_NO = SB.SUBBNO AND SB.company_id = J.company_id
-          INNER JOIN BAND B ON SB.SUBB_BAND_NO = B.BAND_NO 
+          FROM journal J
+          INNER JOIN submain SM ON J.JOURNAL_SUBMAIN_NO = SM.SUBMAIN_NO AND SM.company_id = J.company_id
+          INNER JOIN main M ON SM.SUBMAIN_MAIN_NO = M.MAIN_NO AND M.company_id = J.company_id
+          INNER JOIN subband SB ON M.MAIN_BAND_NO = SB.SUBBNO AND SB.company_id = J.company_id
+          INNER JOIN band B ON SB.SUBB_BAND_NO = B.BAND_NO 
           WHERE J.JOURNAL_DATE BETWEEN ? AND ? AND J.company_id = ?
           GROUP BY B.BAND_NO, B.BAND_NAME
           ORDER BY B.BAND_NO;
@@ -1241,10 +1241,10 @@ app.get("/api/trial-balance", authMiddleware(), async (req, res) => {
             SB.SUBBNAME AS ACCNAME,
             SUM(IFNULL(J.JOURNAL_DR,0)) AS DEBIT,
             SUM(IFNULL(J.JOURNAL_CR,0)) AS CREDIT
-          FROM JOURNAL J
-          INNER JOIN SUBMAIN SM ON J.JOURNAL_SUBMAIN_NO = SM.SUBMAIN_NO AND SM.company_id = J.company_id
-          INNER JOIN MAIN M ON SM.SUBMAIN_MAIN_NO = M.MAIN_NO AND M.company_id = J.company_id
-          INNER JOIN SUBBAND SB ON M.MAIN_BAND_NO = SB.SUBBNO AND SB.company_id = J.company_id
+          FROM journal J
+          INNER JOIN submain SM ON J.JOURNAL_SUBMAIN_NO = SM.SUBMAIN_NO AND SM.company_id = J.company_id
+          INNER JOIN main M ON SM.SUBMAIN_MAIN_NO = M.MAIN_NO AND M.company_id = J.company_id
+          INNER JOIN subband SB ON M.MAIN_BAND_NO = SB.SUBBNO AND SB.company_id = J.company_id
           WHERE J.JOURNAL_DATE BETWEEN ? AND ? AND J.company_id = ?
           GROUP BY SB.SUBBNO, SB.SUBBNAME
           ORDER BY SB.SUBBNO;
@@ -1258,9 +1258,9 @@ app.get("/api/trial-balance", authMiddleware(), async (req, res) => {
             M.MAIN_NAME AS ACCNAME,
             SUM(IFNULL(J.JOURNAL_DR,0)) AS DEBIT,
             SUM(IFNULL(J.JOURNAL_CR,0)) AS CREDIT
-          FROM JOURNAL J
-          INNER JOIN SUBMAIN SM ON J.JOURNAL_SUBMAIN_NO = SM.SUBMAIN_NO AND SM.company_id = J.company_id
-          INNER JOIN MAIN M ON SM.SUBMAIN_MAIN_NO = M.MAIN_NO AND M.company_id = J.company_id
+          FROM journal J
+          INNER JOIN submain SM ON J.JOURNAL_SUBMAIN_NO = SM.SUBMAIN_NO AND SM.company_id = J.company_id
+          INNER JOIN main M ON SM.SUBMAIN_MAIN_NO = M.MAIN_NO AND M.company_id = J.company_id
           WHERE J.JOURNAL_DATE BETWEEN ? AND ? AND J.company_id = ?
           GROUP BY M.MAIN_NO, M.MAIN_NAME
           ORDER BY M.MAIN_NO;
@@ -1274,8 +1274,8 @@ app.get("/api/trial-balance", authMiddleware(), async (req, res) => {
             SM.SUBMAIN_NAME AS ACCNAME,
             SUM(IFNULL(J.JOURNAL_DR,0)) AS DEBIT,
             SUM(IFNULL(J.JOURNAL_CR,0)) AS CREDIT
-          FROM JOURNAL J
-          INNER JOIN SUBMAIN SM ON J.JOURNAL_SUBMAIN_NO = SM.SUBMAIN_NO AND SM.company_id = J.company_id
+          FROM journal J
+          INNER JOIN submain SM ON J.JOURNAL_SUBMAIN_NO = SM.SUBMAIN_NO AND SM.company_id = J.company_id
           WHERE J.JOURNAL_DATE BETWEEN ? AND ? AND J.company_id = ?
           GROUP BY SM.SUBMAIN_NO, SM.SUBMAIN_NAME
           ORDER BY SM.SUBMAIN_NO;
@@ -1286,7 +1286,7 @@ app.get("/api/trial-balance", authMiddleware(), async (req, res) => {
         return res.status(400).json({ error: "Invalid level" });
     }
 
-    const [rows] = await pool.execute(query, [fromDate, toDate, company_id]);
+    const [rows] = await pool.query(query, [fromDate, toDate, company_id]);
     res.json(rows);
   } catch (err) {
     console.error(err);

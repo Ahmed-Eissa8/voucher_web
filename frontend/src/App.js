@@ -74,7 +74,7 @@ const navigate = (path) => {
       case "/report/accountStatement":
       setPage("accountStatement");
       break;
-      case "/report/trialbalance":
+      case "/report/trialBalance":
       setPage("trialbalance");
       break;
     default:
@@ -99,7 +99,7 @@ const navigate = (path) => {
       {/* المحتوى الأساسي */}
       <div
         className={`flex-1 p-6 ${
-          lang === "ar" ? "mr-[60px] md:mr-[220px]" : "ml-[60px] md:ml-[220px]"
+          lang === "ar" ? "md:mr-[220px]" : "md:ml-[220px]"
         }`}
       >
         

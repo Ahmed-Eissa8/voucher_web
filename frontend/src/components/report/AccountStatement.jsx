@@ -96,12 +96,20 @@ export default function AccountStatement({ lang }) {
       return;
     }
 
+    // دالة لتنسيق التاريخ بالتوقيت المحلي لتجنب مشاكل UTC
+    const formatDate = (d) => {
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    };
+
     try {
       const res = await api.get("/account-statement", {
         params: {
           sub_no: subNo,
-          fdate: startDate.toISOString().split("T")[0],
-          ldate: endDate.toISOString().split("T")[0],
+          fdate: formatDate(startDate),
+          ldate: formatDate(endDate),
         },
       });
       setData(res.data);

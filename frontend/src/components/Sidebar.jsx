@@ -13,7 +13,7 @@ import {
 import "./style/Sidebar.css";
 
 function Sidebar({ lang, setLang, navigate }) {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(window.innerWidth > 768);
   const [screens, setScreens] = useState([]);
   const [isAdmin, setIsAdmin] = useState(false);
   const [showReports, setShowReports] = useState(false);
@@ -27,6 +27,13 @@ function Sidebar({ lang, setLang, navigate }) {
     setIsAdmin(role === "admin");
     setScreens(allowedScreens);
     setPermissions(userPermissions);
+
+    // ضبط حالة القائمة بناءً على حجم الشاشة عند تغيير الحجم
+    const handleResize = () => {
+      setOpen(window.innerWidth > 768);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const availableReports = [
@@ -57,7 +64,8 @@ function Sidebar({ lang, setLang, navigate }) {
       return;
     }
     navigate(path);
-    setOpen(false);
+    // إغلاق القائمة فقط إذا كنا على الهاتف
+    if (window.innerWidth <= 768) setOpen(false);
   };
 
   const t = {
@@ -84,10 +92,14 @@ function Sidebar({ lang, setLang, navigate }) {
   }[lang];
 
   return (
-    <div
-      className={`sidebar ${open ? "open" : "collapsed"} ${lang === "ar" ? "rtl" : "ltr"}`}
-      style={{ [lang === "ar" ? "right" : "left"]: 0 }}
-    >
+    <>
+      {/* Overlay for mobile */}
+      {open && <div className="sidebar-overlay" onClick={() => setOpen(false)} />}
+
+      <div
+        className={`sidebar ${open ? "open" : "collapsed"} ${lang === "ar" ? "rtl" : "ltr"}`}
+        style={{ [lang === "ar" ? "right" : "left"]: 0 }}
+      >
       <div className="toggle-btn" onClick={() => setOpen(!open)}>
         <FaBars size={20} />
       </div>
@@ -131,9 +143,8 @@ function Sidebar({ lang, setLang, navigate }) {
         {screens.includes("Reports") && (
           <li
             className={`submenu ${showReports ? "active" : ""}`}
-            onClick={() => setShowReports(!showReports)}
           >
-            <div className="submenu-header">
+            <div className="submenu-header" onClick={() => setShowReports(!showReports)}>
               <FaChartBar /> <span>{t.reports}</span>
             </div>
 
@@ -162,6 +173,7 @@ function Sidebar({ lang, setLang, navigate }) {
         </li>
       </ul>
     </div>
+    </>
   );
 }
 
