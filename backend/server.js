@@ -379,34 +379,25 @@ app.delete("/api/voucher/:id", authMiddleware(), async (req, res) => {
 
 
 app.get("/api/accounts", authMiddleware(), async (req, res) => {
-  const { query, type } = req.query;
+  const { query } = req.query;
+
+  console.log(`Backend /api/accounts received query: '${query}' for company_id: ${req.user.company_id}`);
 
   try {
     let sql;
     let params;
 
-    if (!query && type === "accName") {
-      // جلب كل الحسابات عند التركيز على حقل اسم الحساب
+    if (query) { // If there's a query, search by it
+      sql = `SELECT SUBMAIN_NO, SUBMAIN_NAME FROM submain WHERE company_id = ? AND (SUBMAIN_NO LIKE ? OR SUBMAIN_NAME LIKE ?) ORDER BY SUBMAIN_NO LIMIT 100`;
+      params = [req.user.company_id, `%${query}%`, `%${query}%`];
+    } else { // If query is empty, return all accounts (up to 100) for the company
       sql = `SELECT SUBMAIN_NO, SUBMAIN_NAME FROM submain WHERE company_id = ? ORDER BY SUBMAIN_NO LIMIT 100`;
       params = [req.user.company_id];
-    } else if (!query) {
-      return res.json([]);
-    } else if (type === "accNo") {
-      sql = `SELECT SUBMAIN_NO, SUBMAIN_NAME 
-           FROM submain 
-           WHERE (SUBMAIN_NO LIKE ? OR SUBMAIN_NAME LIKE ?) AND company_id = ?
-           LIMIT 20`;
-      params = [`${query}%`, `${query}%`, req.user.company_id];
-    } else {
-      // البحث في اسم الحساب
-      sql = `SELECT SUBMAIN_NO, SUBMAIN_NAME 
-           FROM submain 
-           WHERE (SUBMAIN_NAME LIKE ? OR SUBMAIN_NO LIKE ?) AND company_id = ?
-           LIMIT 20`;
-      params = [`%${query}%`, `%${query}%`, req.user.company_id];
     }
 
+    console.log("Executing SQL:", sql, "with params:", params);
     const [rows] = await pool.query(sql, params);
+    console.log(`Backend /api/accounts returning ${rows.length} rows.`);
     res.json(rows);
   } catch (err) {
     console.error(err);
@@ -1177,11 +1168,11 @@ app.get('/api/accounts1', authMiddleware(), async (req, res) => {
   const company_id = req.user.company_id;
   try {
     const [rows] = await pool.query(
-      `SELECT submain_no AS sub_no, submain_name AS name 
+      `SELECT SUBMAIN_NO AS sub_no, SUBMAIN_NAME AS name 
        FROM submain 
-       WHERE submain_name LIKE ? AND company_id = ?
+       WHERE (SUBMAIN_NAME LIKE ? OR SUBMAIN_NO LIKE ?) AND company_id = ?
        LIMIT 20`,
-      [`%${search}%`, company_id]
+      [`%${search}%`, `%${search}%`, company_id]
     );
     res.json(rows);
   } catch (err) {

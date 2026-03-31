@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import api from "../api";
 
 import "./style/VoucherForm.css";
@@ -76,6 +77,7 @@ export default function VoucherForm({ lang, permissions }) {
   const [message, setMessage] = useState(null);
   const [companyDetails, setCompanyDetails] = useState(null);
   const [suggestionFocus, setSuggestionFocus] = useState({ row: -1, input: null });
+  const [portalCoords, setPortalCoords] = useState({ top: 0, left: 0, width: 0 });
 
   const addNewRow = () => {
     setEntries(prev => [...prev, { ...emptyEntry }]);
@@ -121,19 +123,16 @@ export default function VoucherForm({ lang, permissions }) {
 }, []);
 
 
-const fetchAccounts = async (query, type = "accNo") => {
-  if (!query) {
-    setAccounts([]);
-    setShowSuggestions(false);
-    return;
-  }
+const fetchAccounts = async (query = "", type = "accNo") => {
+  console.log("Frontend: fetchAccounts called with query:", query, "type:", type);
   try {
     const res = await api.get("/accounts", { params: { query, type } });
+    console.log("Frontend: API response for accounts (length):", res.data.length, "Data:", res.data);
     setAccounts(res.data);
     setShowSuggestions(res.data.length > 0);
     setActiveIndex(res.data.length ? 0 : -1);
   } catch (err) {
-    console.error(err);
+    console.error("Frontend: Error fetching accounts:", err);
   }
 };
 
@@ -390,6 +389,14 @@ const saveVoucher = async () => {
 
 
 
+useEffect(() => {
+  const handleScroll = () => setShowSuggestions(false);
+  window.addEventListener("scroll", handleScroll);
+
+  return () => window.removeEventListener("scroll", handleScroll);
+}, []);
+
+
   return (
     <div
       className="voucher-container"
@@ -478,27 +485,39 @@ const saveVoucher = async () => {
           value={row.accNo}
           disabled={!canEdit} // 🚫 تعطيل لو ما عنده صلاحية تعديل
           onChange={(e) => { handleChange(i, "accNo", e.target.value); fetchAccounts(e.target.value, "accNo"); }}
-          onFocus={() => setSuggestionFocus({ row: i, input: 'accNo' })}
+          // onFocus handler for accNo input
+          onFocus={(e) => {
+            const rect = e.target.getBoundingClientRect();
+            setPortalCoords({
+              top: rect.bottom + window.scrollY,
+              left: rect.left + window.scrollX,
+              width: rect.width
+            });
+            setSuggestionFocus({ row: i, input: 'accNo' });
+            fetchAccounts(e.target.value, "accNo"); 
+          }}
           onBlur={handleInputBlur}
           onKeyDown={(e) => handleKeyDown(e, i)}
         />
-        {showSuggestions && suggestionFocus.row === i && suggestionFocus.input === 'accNo' && accounts.length > 0 && canEdit && (
-          <ul className="suggestions">
-            {accounts.map((acc, idx) => (
-              <li key={idx} className={idx === activeIndex ? "active" : ""} onMouseDown={() => selectSuggestion(i, acc)}>
-                {acc.SUBMAIN_NO} - {acc.SUBMAIN_NAME}
-              </li>
-            ))}
-          </ul>
-        )}
       </td>
-      <td>
+      <td className="with-suggestions">
         <input
           value={row.accName}
           disabled={!canEdit}
           onChange={(e) => { handleChange(i, "accName", e.target.value); fetchAccounts(e.target.value, "accName"); }}
-          onFocus={() => setSuggestionFocus({ row: i, input: 'accName' })}
+          // onFocus handler for accName input
+          onFocus={(e) => {
+            const rect = e.target.getBoundingClientRect();
+            setPortalCoords({
+              top: rect.bottom + window.scrollY,
+              left: rect.left + window.scrollX,
+              width: rect.width
+            });
+            setSuggestionFocus({ row: i, input: 'accName' });
+            fetchAccounts(e.target.value, "accName"); 
+          }}
           onBlur={handleInputBlur}
+          onKeyDown={(e) => handleKeyDown(e, i)}
         />
       </td>
       <td>
@@ -578,6 +597,45 @@ const saveVoucher = async () => {
         {canDelete && <button className="btn delete" onClick={deleteVoucher}>{labels[lang].delete}</button>}
         {!isNew && <button className="btn print" onClick={printVoucher}>{lang === "ar" ? "طباعة " : "Print"}</button>}
       </div>
+
+      {showSuggestions && accounts.length > 0 &&
+  createPortal(
+    <ul
+      className="suggestions"
+      style={{
+        position: "absolute",
+        top: portalCoords.top,
+        left: portalCoords.left,
+        width: portalCoords.width,
+        background: "#fff",
+        border: "1px solid #C8E2E1",
+        maxHeight: "250px",
+        overflowY: "auto",
+        zIndex: 9999,
+        margin: 0,
+        padding: 0,
+        listStyle: "none",
+        boxShadow: "0 4px 15px rgba(0,0,0,0.3)"
+      }}
+    >
+      {accounts.map((acc, idx) => (
+        <li
+          key={idx}
+          className={idx === activeIndex ? "active" : ""}
+          onMouseDown={() => selectSuggestion(suggestionFocus.row, acc)}
+          style={{
+            padding: "8px",
+            cursor: "pointer",
+            background: idx === activeIndex ? "#eee" : "#fff"
+          }}
+        >
+          {acc.SUBMAIN_NO} - {acc.SUBMAIN_NAME}
+        </li>
+      ))}
+    </ul>,
+    document.body
+  )
+}
 
 
 

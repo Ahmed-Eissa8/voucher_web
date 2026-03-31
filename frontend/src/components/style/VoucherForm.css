@@ -48,13 +48,12 @@ h2 {
   box-sizing: border-box;
 }
 
-/* الجدول */
 .voucher-table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
   margin-bottom: 15px;
-  position: relative;
+  position: relative; /* Anchor for suggestions */
 }
 
 .voucher-table th,
@@ -74,14 +73,8 @@ h2 {
 .voucher-table tr:nth-child(even) {
   background: #f0f6f6;
 }
-
 .voucher-table tbody {
-  overflow: visible;
-}
-
-.voucher-table tbody tr {
-  position: relative;
-  overflow: visible;
+  overflow: visible; /* تسمح بخروج القائمة من حدود الجدول */
 }
 
 .voucher-table input {
@@ -96,19 +89,17 @@ h2 {
 /* الاقتراحات */
 .with-suggestions {
   position: relative;
-  overflow: visible;
 }
 
 .suggestions {
   position: absolute;
-  top: 100%;
-  right: 0;
-  left: 0;
+  /* Positioned via Portal inline styles */
   border: 1px solid #C8E2E1;
   background: #fff;
-  max-height: 600px;
+  max-height: 250px; /* تقليل الارتفاع ليتناسب مع الجدول الصغير */
+  width: 100%;
   overflow-y: auto;
-  z-index: 1000;
+  z-index: 9999; /* قيمة عالية جداً لتظهر فوق كل العناصر */
   list-style: none;
   margin: 0;
   padding: 0;

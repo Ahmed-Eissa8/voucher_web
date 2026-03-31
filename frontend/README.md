@@ -75,3 +75,15 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/t
 Company name : kian
 User : admin
 Pass: kian@acc2026?
+
+\\ رفع النسخه بعد البناء
+scp -r build accounting@142.132.233.98:/var/www/accounting/frontend
+
+\\ رفع ملف السيرفر
+scp server.js accounting@142.132.233.98:/var/www/accounting/server
+
+
+
+\\ كلمه مرور المستخدم accounting على الvps
+KianAcc2026!
+
